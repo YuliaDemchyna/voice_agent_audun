@@ -8,29 +8,54 @@
 </head>
 <body>
   <header>
-    <h1>Collection call prototype</h1>
+    <div class="title">
+      <h1>Collection call prototype</h1>
+      <span id="status" class="status">idle</span>
+    </div>
     <div class="controls">
-      <button id="call" disabled>Call Ola</button>
+      <button id="call" class="primary" disabled>Call Ola</button>
       <button id="hangup" disabled>End call</button>
-      <span id="status">idle</span>
+      <button id="reset" title="Clear the screen for the next scenario">New demo</button>
     </div>
   </header>
   <main>
-    <section>
-      <h2>Live transcript</h2>
-      <div id="transcript" class="panel"></div>
+    <aside class="history">
+      <h2>Call history</h2>
+      <ul id="history"></ul>
+    </aside>
+
+    <section class="call">
+      <h2 id="transcript-title">Live transcript</h2>
+      <div id="transcript" class="panel transcript"><p class="empty">Press <b>Call Ola</b> to start.</p></div>
+      <details class="panel-details" open>
+        <summary>Event log</summary>
+        <div id="events" class="panel small"></div>
+      </details>
+      <details class="panel-details">
+        <summary>Escalation tickets <span id="ticket-count"></span></summary>
+        <pre id="tickets" class="panel small"></pre>
+      </details>
+      <details class="panel-details">
+        <summary>Session state</summary>
+        <pre id="session" class="panel small"></pre>
+      </details>
     </section>
-    <section>
-      <h2>Debtor's phone (mock SMS)</h2>
-      <div id="sms" class="panel phone"></div>
-      <h2>Session</h2>
-      <pre id="session" class="panel small"></pre>
-    </section>
-    <section>
-      <h2>Event log</h2>
-      <div id="events" class="panel small"></div>
-      <h2>Escalation tickets</h2>
-      <pre id="tickets" class="panel small"></pre>
+
+    <section class="device">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-status"><span id="clock">9:41</span><span>●●● 5G ▮</span></div>
+        <div class="phone-header">
+          <div class="avatar">N</div>
+          <div>
+            <div class="contact">Nordvik Collections</div>
+            <div class="sub">Text message</div>
+          </div>
+        </div>
+        <div id="sms" class="phone-messages"></div>
+        <div class="phone-input"><span>iMessage</span></div>
+      </div>
+      <p class="caption">Ola's phone (mock SMS)</p>
     </section>
   </main>
   <script type="module" src="/main.js"></script>

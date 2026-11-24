@@ -18,6 +18,24 @@ export function createApp(store: Store = new Store()) {
   // "Start contact": one debtor at a time, so a new session becomes the active one.
   app.post("/api/sessions", (c) => c.json(startSession(store)));
 
+  // Call history for demos: outcome at a glance.
+  app.get("/api/sessions", (c) =>
+    c.json(
+      store.listSessions().map(({ session, startedAt }) => ({
+        id: session.id,
+        startedAt,
+        state: session.state,
+        outcome: session.agreement
+          ? `Agreed: ${session.agreement.instalments === 1 ? "full payment" : `${session.agreement.instalments} instalments`}`
+          : session.escalations.length
+            ? `Escalated: ${session.escalations.map((e) => e.reason).join(", ")}`
+            : session.verified
+              ? "Verified, no agreement"
+              : "Not verified",
+      })),
+    ),
+  );
+
   app.get("/api/sessions/:id", (c) => {
     const session = store.getSession(c.req.param("id"));
     if (!session) return c.json({ error: "not found" }, 404);

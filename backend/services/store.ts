@@ -57,6 +57,18 @@ export class Store {
     return rows.map((r) => ({ seq: r.seq, sessionId: r.session_id, type: r.type, payload: JSON.parse(r.payload), ts: r.ts }));
   }
 
+  /** Newest first, with start time from the first event. */
+  listSessions(limit = 50): Array<{ session: Session; startedAt: string }> {
+    const rows = this.db
+      .prepare(
+        `SELECT s.data AS data, MIN(e.ts) AS started_at FROM sessions s
+         JOIN events e ON e.session_id = s.id
+         GROUP BY s.id ORDER BY started_at DESC LIMIT ?`,
+      )
+      .all(limit) as Array<{ data: string; started_at: string }>;
+    return rows.map((r) => ({ session: JSON.parse(r.data) as Session, startedAt: r.started_at }));
+  }
+
   setActiveSession(id: string): void {
     this.db.prepare("INSERT INTO kv (key, value) VALUES ('active_session', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(id);
   }

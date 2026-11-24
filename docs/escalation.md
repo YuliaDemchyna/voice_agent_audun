@@ -19,6 +19,7 @@ model-written. Everything else is facts the backend recorded.
 | `debt_adviser` | Debtor is working with a debt adviser or NAV | P3 | Pause collection for about 30 days *(UK benchmark, FCA CONC 7.3.11)* |
 | `out_of_policy` | Debtor wants terms the policy engine rejected (discount, more instalments, later start) and asks for review | P3 | 1 week |
 | `verification_failed` | Lockout after too many wrong codes, or a third party claims authority | P3 | 1 week |
+| `recording_declined` | Debtor declines recording, so the call can't be quality-checked (designed, not built in the demo) | P3 | 1 week |
 
 **Deadlines.** The legal floor is a reply to any debtor inquiry within
 1 week, or an interim reply plus a decision on pausing collection (new act

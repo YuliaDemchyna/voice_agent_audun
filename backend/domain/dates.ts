@@ -33,3 +33,8 @@ export function addMonthsClamped(date: IsoDate, months: number): IsoDate {
   const day = Math.min(d, lastDay);
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
+
+/** "8 December 2026", for messages people read. */
+export function formatDate(date: IsoDate): string {
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
+}

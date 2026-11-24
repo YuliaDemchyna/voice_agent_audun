@@ -3,7 +3,7 @@
 // Pure: returns the next session, the events to append, and a result for the model.
 
 import { COLLECTOR_NAME, type Claim, type Debtor } from "./claim.js";
-import { addDays, todayInOslo } from "./dates.js";
+import { addDays, formatDate, todayInOslo } from "./dates.js";
 import { checkOtp, issueOtp, type OtpConfig, type OtpState } from "./otp.js";
 import { availableOptions, evaluatePlan, MAX_DAYS_TO_FIRST_PAYMENT, type ApprovedPlan } from "./policy.js";
 
@@ -181,11 +181,13 @@ export function sendPaymentOptions(session: Session, ctx: Context): ToolOutcome 
   if (!session.verified) return rejected(session, "send_payment_options", "Not verified.");
   if (session.negotiationLocked) return rejected(session, "send_payment_options", "Payment options can't be sent after this escalation.");
   const today = todayInOslo(new Date(ctx.now));
-  const options = availableOptions(session.claim.amountNok, today).slice(0, 3);
+  const c = session.claim;
+  const latest = formatDate(addDays(today, MAX_DAYS_TO_FIRST_PAYMENT));
   const body =
-    `${COLLECTOR_NAME}: your options for ${session.claim.creditor}, ref ${session.claim.reference}, NOK ${session.claim.amountNok}:\n` +
-    options.map((o) => `- ${o}`).join("\n") +
-    `\nInterest and fees are frozen while an agreed plan is kept. To agree a plan or ask questions, call ${CONTACT_PHONE}. Free debt advice: NAV, 55 55 33 39.`;
+    `${COLLECTOR_NAME}: ${c.description} from ${c.creditor} (ref ${c.reference}) was due on ${formatDate(c.originalDueDate)}. Amount owed: NOK ${c.amountNok}.\n` +
+    `Ways to pay, first payment by ${latest}:\n` +
+    `- all at once: NOK ${c.amountNok}\n- 2 monthly payments of NOK ${c.amountNok / 2}\n- 3 monthly payments of NOK ${c.amountNok / 3}\n` +
+    `If you agree a plan with us, interest and fees stop while you keep to it. To agree a plan or ask a question, call ${CONTACT_PHONE}. Free debt advice: NAV, 55 55 33 39.`;
   return {
     session,
     events: [{ type: "payment_options_sent" }, { type: "sms_sent", to: session.debtor.phone, purpose: "payment_options", body }],
@@ -244,7 +246,7 @@ export function confirmAgreement(session: Session, args: ConfirmArgs, ctx: Conte
     return rejected(session, "confirm_agreement", "Include the person's exact words of confirmation.");
   }
   const agreedOn = todayInOslo(new Date(ctx.now));
-  const lines = plan.payments.map((p) => `- ${p.dueDate}: NOK ${p.amountNok}`).join("\n");
+  const lines = plan.payments.map((p) => `- ${formatDate(p.dueDate)}: NOK ${p.amountNok}`).join("\n");
   const body =
     `${COLLECTOR_NAME}: confirmation of your payment plan for ${session.claim.creditor}, ref ${session.claim.reference}.\n` +
     `${lines}\nTotal NOK ${plan.totalAmountNok}. Interest and fees are frozen while the plan is kept.\n` +

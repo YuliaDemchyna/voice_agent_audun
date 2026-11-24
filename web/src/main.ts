@@ -6,7 +6,6 @@ type VapiClient = InstanceType<typeof VapiImport>;
 const Vapi = ((VapiImport as unknown as { default?: typeof VapiImport }).default ?? VapiImport) as typeof VapiImport;
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
-const startBtn = $<HTMLButtonElement>("start");
 const callBtn = $<HTMLButtonElement>("call");
 const hangupBtn = $<HTMLButtonElement>("hangup");
 const statusEl = $("status");
@@ -24,6 +23,7 @@ async function init() {
     return;
   }
   vapi = new Vapi(config.vapiPublicKey);
+  callBtn.disabled = false;
   vapi.on("call-start", () => setStatus("in call"));
   vapi.on("call-end", () => {
     setStatus("call ended");
@@ -88,21 +88,17 @@ function escapeHtml(s: string) {
   return s.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]!);
 }
 
-startBtn.onclick = async () => {
+// One action, like a real outbound call: create the contact session, then dial.
+callBtn.onclick = async () => {
+  if (!vapi) return;
+  callBtn.disabled = true;
   const s = (await (await fetch("/api/sessions", { method: "POST" })).json()) as { id: string };
   sessionId = s.id;
   $("transcript").innerHTML = "";
   lastRole = undefined;
   lastBubble = undefined;
-  callBtn.disabled = !vapi;
-  setStatus(`contact started: ${sessionId}`);
-};
-
-callBtn.onclick = async () => {
-  if (!vapi || !sessionId) return;
-  callBtn.disabled = true;
   hangupBtn.disabled = false;
-  setStatus("connecting…");
+  setStatus("calling Ola…");
   await vapi.start(assistantId, { variableValues: { sessionId } });
 };
 

@@ -71,7 +71,7 @@ describe("agreement (C5, N2, N3)", () => {
     const out = confirmAgreement(s, { instalments: 3, first_payment_date: "2026-12-05", debtor_confirmation_quote: "Yes, that works." }, ctx);
     expect(out.session.state).toBe("agreed");
     const sms = out.events.find((e) => e.type === "sms_sent" && e.purpose === "agreement_confirmation");
-    expect(sms && "body" in sms && sms.body).toMatch(/2026-12-05: NOK 1000[\s\S]*2027-01-05: NOK 1000[\s\S]*2027-02-05: NOK 1000/);
+    expect(sms && "body" in sms && sms.body).toMatch(/5 December 2026: NOK 1000[\s\S]*5 January 2027: NOK 1000[\s\S]*5 February 2027: NOK 1000/);
   });
 
   it("cannot confirm without an approved proposal", () => {

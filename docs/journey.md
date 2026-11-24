@@ -54,7 +54,7 @@ rulebook.
 | Edge case | Agent response | Outcome | Enforced by | Prototype |
 |---|---|---|---|---|
 | Wrong person answers ("he's not home", "wrong number") | Apologise, disclose nothing, ask if there is a better time to reach the person, end politely. | Follow-up (retry within N9 limits). On "wrong number", flag the number so it isn't used again until it is confirmed to belong to the debtor (circular 5/2022 § 2). | prompt, plus code: no claim data is available before verification | ✅ (eval persona) |
-| Voicemail | Leave a neutral message: name, "a personal matter", a callback number. No debt details (our inference from N1; no source covers voicemail directly). | Follow-up (retry) | prompt | 📐 needs telephony |
+| Voicemail | Leave a neutral message: name, "a personal matter", a callback number. No debt details (our inference from N1; no source covers voicemail directly). | Follow-up (retry) | prompt | 📐 non-goal: voicemail detection is voice infrastructure ([product.md](product.md#non-goals)) |
 | Debtor is suspicious ("is this a scam?") | Acknowledge; explain how to verify independently (call the creditor's public number); explain the code is sent to their own phone. Never ask for bank details. | Auto | prompt | ✅ |
 | Asks "is this an AI?" | Always truthful: yes. | Auto | prompt (also stated in the opening) | ✅ |
 | Inconvenient time ("I'm driving", "call later") | Offer a callback at a time they choose, within permitted hours (N9), and end the call. | Follow-up (scheduled callback) | prompt | 🟡 callback request logged, not scheduled |

@@ -94,16 +94,13 @@ overdue" in speech, and the current N1 check only covers tools.
 | F5 `non_english` | Limited English; asks for Norwegian. | Language capability | Say plainly that the AI speaks English only; offer a Norwegian-speaking person (question). | hard: escalated | P2 | — |
 | F6 `chatty_offtopic` | Long stories, tangents, asks the AI personal questions. | Staying on track kindly | Brief warmth, then back to the two-option choice. | judge D4, D8 | P3 | — |
 
-## Voice-only cases (can't be tested in text mode)
+## Voice-only cases: out of scope
 
-The text simulator can't cover these. They need a short **live test script**
-run in a few real calls:
-
-- Long silences and someone who doesn't answer.
-- Interruptions mid-sentence (barge-in).
-- Speech-to-text mishearing the code digits ("five" heard as "nine"), and accents.
-- Background noise; a child or TV.
-- Voicemail picking up (the journey says leave a neutral message; this isn't built).
+Long silences, barge-in, speech-to-text mishearing code digits or accents,
+background noise and voicemail detection can't be tested in text mode. They
+are a **non-goal** ([product.md](../../docs/product.md#non-goals)): they depend
+on the transcription model and the voice platform, not on the agent's
+behaviour.
 
 ## Gaps this exercise found (outside the personas)
 

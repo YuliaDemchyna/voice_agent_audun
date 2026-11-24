@@ -66,6 +66,17 @@ admin UI, multi-claim debtors, and a contact scheduler. The scheduler is
 where rulebook N9 (legal call hours and attempt limits) would be enforced; it
 is designed but not built, and in the demo calls are started manually.
 
+**Voice infrastructure quality** is also a non-goal: long silences, barge-in
+(interruptions mid-sentence), speech-to-text mishearing digits or accents,
+background noise, and voicemail detection. These depend mostly on the
+transcription model and the voice platform, not on the agent's behaviour,
+and there was no time to tune them. They are general infrastructure that
+every voice bot needs, so we expect the tooling to solve them well (some
+providers may already) and would pick the best available option in
+production, rather than build it. The agent design only assumes a transcript
+comes in and text goes out. The voicemail message itself (neutral, no debt
+details) is still specified in the journey.
+
 ## Success metrics
 
 | Metric | Type | Target (prototype) | How measured |

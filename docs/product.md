@@ -1,22 +1,31 @@
 # Product: AI collection call with written follow-up
 
+The context is assumed by me from 1. conversation wih Peter, 2.  short collab with Corafone, 3. research and experience within voice industry.
+
+## Context: the industry
+
+- Human agents do collection calls today. It is expensive, and quality varies
+from agent to agent.
+- Staff turnover is high, so hiring and training never stop.
+- Most calls are repetitive: verify, explain, agree a standard plan. AI takes
+those, and scarce human time goes to the edge cases: disputes, hardship,
+requests outside policy.
+- That raises the quality bar for the human role: fewer cases, but harder
+ones that matter more.
+
+## Context: the debtor
+
+- Often stressed, embarrassed or suspicious ("is this a scam?").
+- Most can pay with some flexibility. A minority are in hardship or dispute
+the claim.
+- Mishandling either group harms them and breaches good collection practice
+(*god inkassoskikk*; see [rulebook.md](rulebook.md)).
+
 ## Problem
 
-A creditor has an overdue claim (example: NOK 3,000). Someone has to reach the
-debtor, confirm it is the right person, explain the claim, agree a way to pay
-and put the agreement in writing. Human collectors do this well but expensively
-and inconsistently. Letters are cheap but rarely produce an agreement.
-
-The debtor is often stressed, embarrassed or suspicious ("is this a scam?").
-Many of them could pay with a small amount of flexibility. A minority are in
-real hardship or dispute the debt. Getting it wrong with either group causes
-harm, and in Norway it can also breach good collection practice
-(*god inkassoskikk*, inkassoloven § 8; see [rulebook.md](rulebook.md)).
-
-An AI agent can make this call at any scale. The question is how to make it
-**safe by construction**: it must never disclose a debt to the wrong person,
-never agree something outside policy, and never pressure someone in a
-vulnerable moment.
+A creditor has an overdue claim (NOK 3,000). Someone has to reach the debtor
+at a permitted time, confirm their identity, explain the claim, agree a
+payment plan within the creditor's policy, and confirm it in writing.
 
 ## Users
 
@@ -26,34 +35,83 @@ vulnerable moment.
 | **Creditor / Audun operator** | Owns the claim and the policy | "Turn overdue claims into kept payment agreements at low cost, without compliance risk or reputational damage." |
 | **Human reviewer** | Collector who handles escalations | "When the agent can't or shouldn't decide, give me everything I need to act without calling the debtor back to re-ask." |
 
-## Product principles (debtor-first)
+## Product principles
 
-These drive the architecture; see [architecture.md](architecture.md).
+These say what wins when two good things conflict. **When two principles
+conflict, the higher one wins.** Evidence strength: **Law** (binding in
+Norway), **Guidance** (a regulator or industry body), **Research**, or
+**Belief** (our hypothesis, with the metric that tests it).
 
-1. **Identify, then verify, then disclose.** The agent says who it is (an AI
-   assistant calling on behalf of the creditor) and why it is calling, without
-   mentioning the debt, until a one-time code has been verified by the
-   backend. Verification is framed as protecting the debtor, not as a hurdle.
-2. **Say what's possible, not just what isn't.** A rejected request (e.g. a
-   discount) always comes back with a reason and the options that *are*
-   available, or an offer of human review.
-3. **Nothing is agreed until it's read back and confirmed.** The agent reads
-   the plan in full (amounts, dates) and asks for a clear yes. The written
-   follow-up repeats it.
-4. **The human is always one sentence away.** Asking for a person, disputing
-   the claim, or showing signs of hardship moves the case to a human. The
-   reviewer receives a complete summary.
-5. **Hard rules are code; soft rules are evaluated.** Verification, policy and
-   confirmation are enforced by the backend, not the prompt. Tone, pacing and
-   empathy are measured by evals.
+1. **Privacy over reach.** If we can't verify who we're talking to, we
+   disclose nothing and try again later. That holds even if it means the
+   claim goes unresolved today.
+   *Law:* duty of confidentiality (inkassoloven 1988 § 28 / new act § 37);
+   GDPR Art. 5(1)(f). *Guidance:* Finanstilsynet circular 5/2022 §§ 2, 5
+   names calling the wrong person as a risk to control.
+
+2. **Guarantees over flexibility.** Anything that must never happen is
+   blocked in code, not just asked for in the prompt. The agent loses room to
+   improvise, and out-of-policy requests go to a human instead of the model's
+   judgement.
+   *Brief:* "the model cannot override verification". *Evidence:* the
+   prompt-injection and verification-bypass eval personas (Phase 2) must
+   fail against the backend, not merely against the prompt.
+
+3. **When in doubt, escalate.** A human over automation rate. A needless
+   escalation costs a reviewer a few minutes; a missed one harms the debtor
+   and breaches the law.
+   *Law:* collection must be adjusted for debtors in serious difficulty (new
+   act § 14(4)); collection stops on a dispute (§ 24(2)); GDPR Art. 22(3)
+   gives a right to human review. *Guidance:* FCA FG21/1 and CONC 7.10 on
+   vulnerability and capacity.
+
+4. **Debtor experience over short-term conversion.** No pressure, even when
+   it would close more plans on this call.
+   *Law:* pressure breaches good collection practice (*god inkassoskikk*,
+   1988 act § 8), and then the debtor owes no collection costs (§ 17(4)). So
+   pressure costs money directly, not just goodwill. *Research:* one field
+   study found AI collection calls underperformed human calls, with lasting
+   effects (working paper, unreviewed). Behavioural trials found that clearer,
+   more respectful letters raised repayment (BIT, HMRC). *Belief:* respectful
+   treatment leads to more kept plans over time. No study isolates this for
+   live calls, so we measure it: kept-promise rate and complaint rate.
+
+5. **Collaboration over closing.** Understand the debtor's situation before
+   proposing terms. Offer the options neutrally. "Not now" is an acceptable
+   outcome: we send the options in writing and call back at their chosen
+   time. A plan the debtor chose is a plan they keep.
+   *Guidance:* listen first and fit the plan to circumstances (FCA CONC
+   7.3.4; Money Advice Trust IDEA). Respect opt-outs and contact preferences
+   (circular 5/2022 § 5). *Research:* debtors prompted to contact their
+   creditor themselves repaid more ("Call first, pay later", *Behavioural
+   Public Policy*). *Law:* an agreed plan binds the creditor (1988 act § 13 /
+   new act § 27), so a bad plan is a costly one.
+
+6. **Honest about limits over seamless.** The agent says it is an AI, says
+   what it can and can't agree to, and every "no" comes with the reason and
+   the options that *are* available. "I don't know" beats a plausible guess.
+   *Law:* communication must be correct and understandable (new act § 15).
+   *Guidance:* EU AI Act Art. 50 requires disclosing an AI at first contact
+   (in force in the EU, not yet in Norway); FCA CONC 7.9.1, 7.11.
+
+7. **Written over spoken for anything binding.** Spoken words carry the
+   conversation; writing carries the commitment. Agreements, dispute
+   outcomes and payment details go in writing, and payment details are never
+   asked for on the call.
+   *Law:* written confirmation of each instalment date and amount (new act
+   § 16(4)); a written, reasoned answer to disputes (§ 25). *Brief:* "send a
+   written follow-up".
+
+See [rulebook.md](rulebook.md) for the concrete rules each principle
+produces, and [architecture.md](architecture.md) for how they are enforced.
 
 ## Goals (prototype)
 
 - One debtor end-to-end: contact → OTP → claim Q&A → plan → confirmation →
-  written follow-up, or → escalation ticket.
+written follow-up, or → escalation ticket.
 - Hard rules provably hold: shown by evals against adversarial personas.
 - Every edge case in [journey.md](journey.md) is handled or listed as
-  designed-but-not-built.
+designed-but-not-built.
 
 ## Non-goals
 

@@ -65,8 +65,6 @@ multiple concurrent debtors, production auth, payment processing, creditor
 admin UI, multi-claim debtors, and a contact scheduler. The scheduler is
 where rulebook N9 (legal call hours and attempt limits) would be enforced; it
 is designed but not built, and in the demo calls are started manually.
-Also out of scope: handling a debtor who declines recording (designed: the call
-goes to a human, rulebook E10).
 
 ## Success metrics
 

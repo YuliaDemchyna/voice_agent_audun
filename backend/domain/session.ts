@@ -39,6 +39,7 @@ export const LOCKING_REASONS: ReadonlySet<EscalationReason> = new Set([
   "contact_preference",
   "debt_adviser",
   "verification_failed",
+  "recording_declined",
 ]);
 
 export interface Escalation {
@@ -267,6 +268,10 @@ const ESCALATION_SCRIPT: Partial<Record<EscalationReason, { say: string; sms: (s
     say: "Confirm you've recorded that they don't want calls from us. Be honest: you can't promise there will never be written contact about the claim; a colleague will review the request and reply once. Then close the call.",
     sms: (s) => `${COLLECTOR_NAME}: we have recorded your request not to be called about ref ${s.claim.reference}. A colleague will review it. Questions: ${CONTACT_PHONE}.`,
   },
+  recording_declined: {
+    say: "Say that's completely fine, a colleague will contact them another way, thank them, and end the call now. Do not mention the reason for the call.",
+    sms: () => `${COLLECTOR_NAME}: thank you for your time. A colleague will contact you without recording. You can also call us on ${CONTACT_PHONE}.`,
+  },
   crisis: {
     say: "Stay calm and kind. Mention Mental Helse's helpline, 116 123. Tell them a person from the team will reach out, and do not talk about the claim.",
     sms: () => `${COLLECTOR_NAME}: thank you for talking with us. A member of our team will be in touch. If you need someone to talk to now, Mental Helse's helpline is 116 123.`,
@@ -280,7 +285,9 @@ const ESCALATION_SCRIPT: Partial<Record<EscalationReason, { say: string; sms: (s
 export function escalate(session: Session, escalation: Escalation): ToolOutcome {
   const locked = LOCKING_REASONS.has(escalation.reason) || session.negotiationLocked;
   const script = ESCALATION_SCRIPT[escalation.reason];
-  const body = !session.verified
+  const body = escalation.reason === "recording_declined" && script
+    ? script.sms(session) // says nothing about the claim, so safe before verification
+    : !session.verified
     ? `${COLLECTOR_NAME} tried to reach you about a personal matter. Please call us on ${CONTACT_PHONE}.` // nothing before verification (N1)
     : script
       ? script.sms(session)

@@ -27,4 +27,10 @@ export const personas: Persona[] = [
       "You are Ola Nordmann. You lost your job last month and you're struggling to pay rent. You get emotional when the amount is mentioned. You can't commit to any payment today.",
     expect: { escalationReason: "hardship" },
   },
+  {
+    id: "declines_recording",
+    description:
+      "You are Ola Nordmann. As soon as the agent mentions recording, say you don't want this call recorded. If they ask, confirm you're Ola, but don't want to continue a recorded call.",
+    expect: { escalationReason: "recording_declined", agreement: false },
+  },
 ];

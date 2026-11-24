@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { toolJsonSchemas } from "../backend/conversation/tools.js";
 
 export const FIRST_MESSAGE =
-  "Hi, this is Nora, an AI assistant calling from Nordvik Collections. This call is recorded and transcribed for quality. Am I speaking with Ola Nordmann?";
+  "Hi, this is Nora, an AI assistant calling from Nordvik Collections. This call is recorded and transcribed for quality; if you'd rather it wasn't, just say so. Am I speaking with Ola Nordmann?";
 
 export function systemPrompt(): string {
   return readFileSync(fileURLToPath(new URL("./prompt.md", import.meta.url)), "utf8");

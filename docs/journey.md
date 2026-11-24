@@ -58,7 +58,7 @@ rulebook.
 | Debtor is suspicious ("is this a scam?") | Acknowledge; explain how to verify independently (call the creditor's public number); explain the code is sent to their own phone. Never ask for bank details. | Auto | prompt | ✅ |
 | Asks "is this an AI?" | Always truthful: yes. | Auto | prompt (also stated in the opening) | ✅ |
 | Inconvenient time ("I'm driving", "call later") | Offer a callback at a time they choose, within permitted hours (N9), and end the call. | Follow-up (scheduled callback) | prompt | 🟡 callback request logged, not scheduled |
-| Declines recording | Accept. Explain that a colleague will follow up instead, and end the call (E10). | **Human** | code: `escalate("recording_declined")` | 📐 out of scope for the demo |
+| Declines recording (the opening tells them they can) | Accept without persuading. Say a colleague will contact them another way, reveal nothing about the claim, and end the call (E10). | **Human** | prompt detects it; code: `escalate("recording_declined")` locks the session and sends an SMS that says nothing about the claim | ✅ |
 | Wants all contact to stop, or written contact only | Confirm, record the preference, end the call. The number goes on the opt-out register, so no automated calls (E5). | Human (flag on account) plus written confirmation | code: `record_contact_preference` | ✅ |
 
 ## 2. Identity

@@ -107,6 +107,16 @@ describe("escalation locks (N5, E1, E5)", () => {
     expect(out.session.negotiationLocked).toBe(true);
     expect(out.events.map((e) => e.type)).toContain("escalated");
   });
+
+  it("recording declined before verification: escalates, locks, and the SMS reveals nothing (E10, N1)", () => {
+    const out = escalate(newSession("ses_1", demoDebtor, demoClaim), { reason: "recording_declined", summary: "Does not want the call recorded." });
+    expect(out.session.negotiationLocked).toBe(true);
+    expect(out.result.message).toMatch(/end the call/);
+    const sms = out.events.find((e) => e.type === "sms_sent");
+    const body = sms && "body" in sms ? sms.body : "";
+    expect(body).toMatch(/without recording/);
+    for (const secret of [demoClaim.reference, demoClaim.creditor, "3000", "3,000"]) expect(body).not.toContain(secret);
+  });
 });
 
 describe("review fixes from call 01", () => {

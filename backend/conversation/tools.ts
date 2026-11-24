@@ -53,7 +53,7 @@ export const toolSchemas = {
     }),
   },
   escalate: {
-    description: "Hand the case to a human reviewer. Use for disputes, hardship, crisis, confusion, requests for a person, debt advisers, or out-of-policy requests the person wants reviewed.",
+    description: "Hand the case to a human reviewer. Use for disputes, hardship, crisis, confusion, requests for a person, debt advisers, out-of-policy requests the person wants reviewed, or when the person does not want the call recorded.",
     input: z.object({
       reason: z.enum(ESCALATION_REASONS),
       summary: z.string().describe("One or two sentences for the reviewer"),

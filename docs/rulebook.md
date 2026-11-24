@@ -17,7 +17,7 @@ Not legal advice.
 
 | ID | Rule | Enforced by | Source | Principle |
 |---|---|---|---|---|
-| C1 | Open by naming the calling company, saying it is an AI assistant, and saying the call is recorded and transcribed and why. If the person declines recording, the call goes to a human (E10). | prompt | AI Act Art. 50 (best practice; not yet binding in Norway); Datatilsynet on call recording | 6 |
+| C1 | Open by naming the calling company, saying it is an AI assistant, saying the call is recorded and transcribed and why, and telling the person they can say if they'd rather it wasn't. If they decline, the agent ends the call and it goes to a human (E10). | prompt | AI Act Art. 50 (best practice; not yet binding in Norway); Datatilsynet on call recording | 6 |
 | C2 | Send a one-time code to the number on file and ask for it back. The backend verifies it. | code | **[brief]** | 1, 2 |
 | C3 | After verification, state the claim (creditor, amount, what it is for, due date) using only the claim record. | code (data gate) | **[brief]**; new act § 15 (accurate, understandable) | 6 |
 | C4 | Offer and agree full payment, or **2–3 equal monthly instalments**. **The first (or only) payment is always due within 14 calendar days of the agreement date**, so full payment is also due within 14 days. Later instalments fall on the same day of each following month. Any other timing (for example, one full payment on day 60) is out of policy and goes to E3. Plans of 2–3 instalments carry no instalment fee. **Interest and fees are frozen while the plan is kept**, so the total stays at the claim amount as of the agreement date (NOK 3,000), and every instalment amount is known up front. | code (policy engine) | **[brief]**; collection regulation (inkassoforskriften) § 2-4; interest freeze allowed in the debtor's favour (forsinkelsesrenteloven §§ 1, 4 c) | 2, 5 |
@@ -53,7 +53,7 @@ Not legal advice.
 | E7 | **Complaint** about the collector or the agent, or abusive conduct. | prompt | new act § 17 (inquiries answered within 1 week) | 3 |
 | E8 | **Crisis**: self-harm or suicide mentioned, or acute panic. Stop all talk of the claim, give crisis-line information, and hand over at once. | prompt detects it; code locks the session | new act § 14(4); research/collector-norms.md (our inference: no source sets an AI crisis protocol) | 3 |
 | E9 | **Debt adviser**: the debtor is working with an adviser or NAV. Pause collection for about 30 days. | code: `escalate("debt_adviser")` | FCA CONC 7.3.11 (UK benchmark; no Norwegian equivalent found) | 4, 5 |
-| E10 | **Declines recording.** Without a transcript we can't check that the agent met the quality bar, so the call goes to a human. Out of scope for the demo. | code: `escalate("recording_declined")` (designed, not built) | Datatilsynet: recording to document an agreement needs consent | 3, 7 |
+| E10 | **Declines recording.** Without a transcript we can't check that the agent met the quality bar, so the agent accepts, reveals nothing, ends the call, and a human follows up. | prompt detects it; code: `escalate("recording_declined")` locks the session | Datatilsynet: recording to document an agreement needs consent | 3, 7 |
 
 ## Open points for review
 
@@ -71,5 +71,9 @@ Not legal advice.
   call goes to a human (E10): without a transcript we can't check that the
   agent met the quality bar. Later, once the agent's behaviour is proven by
   evals and monitoring, calls without a transcript can stay automated, as long
-  as every agreement and plan ends up in writing (principle 7). Handling this
-  is out of scope for the demo.
+  as every agreement and plan ends up in writing (principle 7).
+- **Recording opt-out in the demo (decided 2026-11-24, supersedes "out of
+  scope").** The opening tells the person they can say if they'd rather not be
+  recorded. If they do, the agent calls `escalate("recording_declined")` and
+  hangs up. The SMS sent says nothing about the claim, so this works before
+  verification.

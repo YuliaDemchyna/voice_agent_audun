@@ -15,7 +15,7 @@ will follow up.
 **Enforced by:** `code` means the backend makes the decision and the model
 cannot override it. `prompt` means agent behaviour, checked by evals.
 
-Rules referenced as R-x are in [rulebook.md](rulebook.md).
+Rule IDs (C1, N1, E1, ...) refer to [rulebook.md](rulebook.md).
 
 ```mermaid
 stateDiagram-v2
@@ -47,7 +47,7 @@ error unless the session is `Verified` or later.
 **Happy path:** the agent greets the person, says it is an AI assistant calling
 on behalf of [creditor] about "a personal matter", and asks to speak with the
 named debtor. It does not mention debt, amount or creditor type.
-*(Whether the creditor can be named before verification: see R-pending.)*
+The agent names only the calling company, not the creditor (N1). The agent also says it is an AI and that the call is recorded (C1). Whether to name even the company is an open point in the rulebook.
 
 | Edge case | Agent response | Outcome | Enforced by | Prototype |
 |---|---|---|---|---|
@@ -84,7 +84,7 @@ only the claim record returned by the tool. Nothing is invented.
 | Edge case | Agent response | Outcome | Enforced by | Prototype |
 |---|---|---|---|---|
 | Question the claim record doesn't answer | Say it doesn't have that information. Offer to note the question for a human or include it in the written follow-up. | Follow-up or Human | prompt | ✅ |
-| **Dispute** ("I already paid", "this isn't mine", "the amount is wrong") | Acknowledge, don't argue, don't push for payment. Record the reason. Say a person will review it and that collection pauses while it is reviewed *(confirm pause rule: R-pending)*. | **Human** | code: `escalate(reason="dispute")`; negotiation tools disabled after a dispute | ✅ |
+| **Dispute** ("I already paid", "this isn't mine", "the amount is wrong") | Acknowledge, don't argue, don't push for payment. Record the reason. Say a person will review it and that collection pauses while it is reviewed and they will get a written answer (E1, new act §§ 24–25). | **Human** | code: `escalate(reason="dispute")`; negotiation tools disabled after a dispute | ✅ |
 | Confused about who the creditor is | Explain the original creditor and the relationship. | Auto | prompt | ✅ |
 
 ## 4. Negotiation
@@ -98,7 +98,7 @@ with the first payment within 14 days. The model calls
 |---|---|---|---|---|
 | Asks for a discount | Explain that discounts aren't available. Present the instalment option. If they still want one, offer human review. | Auto, or Human if insisted | **code**: the policy engine rejects any total below the claim | ✅ (eval persona) |
 | Asks for more instalments (e.g. 6) or a later first payment | Explain the options that are available. Offer human review for anything else. | Human if they want it | **code** | ✅ |
-| Can't pay at all right now | No pressure. Ask if they want a person to look at options. Signpost free debt advice (NAV *gjeldsrådgivning*, R-pending). | Human | prompt | ✅ |
+| Can't pay at all right now | No pressure. Ask if they want a person to look at options. Signpost free debt advice (NAV *gjeldsrådgivning*, C6). | Human | prompt | ✅ |
 | **Hardship or distress** (job loss, illness, bereavement, crying, "I can't cope") | Slow down, acknowledge, stop negotiating. Offer to pause and have a person follow up. Signpost help. | **Human** (priority) | prompt (detection), code (`escalate(reason="hardship")` disables negotiation tools) | ✅ (eval persona) |
 | Evasive or non-committal ("maybe", "I'll think about it") | Summarise the options once. Offer to send them in writing. Don't push repeatedly. | Follow-up (options sent) | prompt | ✅ (eval persona) |
 | Asks for a human | Accept immediately. Don't try to retain them. | **Human** | code: `escalate(reason="requested_human")` | ✅ |

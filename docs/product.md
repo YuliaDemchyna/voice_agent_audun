@@ -37,73 +37,66 @@ payment plan within the creditor's policy, and confirm it in writing.
 
 ## Product principles
 
-These say what wins when two good things conflict. **When two principles
-conflict, the higher one wins.** Evidence strength: **Law** (binding in
-Norway), **Guidance** (a regulator or industry body), **Research**, or
-**Belief** (our hypothesis, with the metric that tests it).
+What wins when two good things conflict. **When two principles conflict, the higher one wins.**
+Evidence is tagged Law, Guidance, Research, or Belief (a hypothesis plus the metric that tests it).
 
-1. **Privacy over reach.** If we can't verify who we're talking to, we
-   disclose nothing and try again later. That holds even if it means the
-   claim goes unresolved today.
-   *Law:* duty of confidentiality (inkassoloven 1988 § 28 / new act § 37);
-   GDPR Art. 5(1)(f). *Guidance:* Finanstilsynet circular 5/2022 §§ 2, 5
-   names calling the wrong person as a risk to control.
+1. **Privacy over reach.** If we can't verify who we're talking to, we disclose nothing and try again later, even if the claim goes unresolved today.
 
-2. **Guarantees over flexibility.** Anything that must never happen is
-   blocked in code, not just asked for in the prompt. The agent loses room to
-   improvise, and out-of-policy requests go to a human instead of the model's
-   judgement.
-   *Brief:* "the model cannot override verification". *Evidence:* the
-   prompt-injection and verification-bypass eval personas (Phase 2) must
-   fail against the backend, not merely against the prompt.
+   <details><summary>Evidence</summary>
 
-3. **When in doubt, escalate.** A human over automation rate. A needless
-   escalation costs a reviewer a few minutes; a missed one harms the debtor
-   and breaches the law.
-   *Law:* collection must be adjusted for debtors in serious difficulty (new
-   act § 14(4)); collection stops on a dispute (§ 24(2)); GDPR Art. 22(3)
-   gives a right to human review. *Guidance:* FCA FG21/1 and CONC 7.10 on
-   vulnerability and capacity.
+   **Law:** duty of confidentiality (inkassoloven 1988 § 28 / new act § 37); GDPR Art. 5(1)(f). **Guidance:** Finanstilsynet circular 5/2022 §§ 2, 5 names calling the wrong person as a risk to control.
 
-4. **Debtor experience over short-term conversion.** No pressure, even when
-   it would close more plans on this call.
-   *Law:* pressure breaches good collection practice (*god inkassoskikk*,
-   1988 act § 8), and then the debtor owes no collection costs (§ 17(4)). So
-   pressure costs money directly, not just goodwill. *Research:* one field
-   study found AI collection calls underperformed human calls, with lasting
-   effects (working paper, unreviewed). Behavioural trials found that clearer,
-   more respectful letters raised repayment (BIT, HMRC). *Belief:* respectful
-   treatment leads to more kept plans over time. No study isolates this for
-   live calls, so we measure it: kept-promise rate and complaint rate.
+   </details>
 
-5. **Collaboration over closing.** Understand the debtor's situation before
-   proposing terms. Offer the options neutrally. "Not now" is an acceptable
-   outcome: we send the options in writing and call back at their chosen
-   time. A plan the debtor chose is a plan they keep.
-   *Guidance:* listen first and fit the plan to circumstances (FCA CONC
-   7.3.4; Money Advice Trust IDEA). Respect opt-outs and contact preferences
-   (circular 5/2022 § 5). *Research:* debtors prompted to contact their
-   creditor themselves repaid more ("Call first, pay later", *Behavioural
-   Public Policy*). *Law:* an agreed plan binds the creditor (1988 act § 13 /
-   new act § 27), so a bad plan is a costly one.
+2. **Guarantees over flexibility.** Anything that must never happen is blocked in code, not just asked for in the prompt. Out-of-policy requests go to a human, not to the model's judgement.
 
-6. **Honest about limits over seamless.** The agent says it is an AI, says
-   what it can and can't agree to, and every "no" comes with the reason and
-   the options that *are* available. "I don't know" beats a plausible guess.
-   *Law:* communication must be correct and understandable (new act § 15).
-   *Guidance:* EU AI Act Art. 50 requires disclosing an AI at first contact
-   (in force in the EU, not yet in Norway); FCA CONC 7.9.1, 7.11.
+   <details><summary>Evidence</summary>
 
-7. **Written over spoken for anything binding.** Spoken words carry the
-   conversation; writing carries the commitment. Agreements, dispute
-   outcomes and payment details go in writing, and payment details are never
-   asked for on the call.
-   *Law:* written confirmation of each instalment date and amount (new act
-   § 16(4)); a written, reasoned answer to disputes (§ 25). *Brief:* "send a
-   written follow-up".
+   **Brief:** "the model cannot override verification". **Eval:** the prompt-injection and verification-bypass eval personas (Phase 2) must fail against the backend, not merely against the prompt.
 
-See [rulebook.md](rulebook.md) for the concrete rules each principle
-produces, and [architecture.md](architecture.md) for how they are enforced.
+   </details>
+
+3. **When in doubt, escalate.** A human over automation rate. A needless escalation costs a reviewer a few minutes; a missed one harms the debtor and breaches the law.
+
+   <details><summary>Evidence</summary>
+
+   **Law:** collection must be adjusted for debtors in serious difficulty (new act § 14(4)); collection stops on a dispute (§ 24(2)); GDPR Art. 22(3) gives a right to human review. **Guidance:** FCA FG21/1 and CONC 7.10 on vulnerability and capacity.
+
+   </details>
+
+4. **Debtor experience over short-term conversion.** No pressure, even when it would close more plans on this call.
+
+   <details><summary>Evidence</summary>
+
+   **Law:** pressure breaches good collection practice (*god inkassoskikk*, 1988 act § 8), and then the debtor owes no collection costs (§ 17(4)), so pressure costs money directly. **Research:** one field study found AI collection calls underperformed human calls, with lasting effects (working paper, unreviewed). Clearer, more respectful letters raised repayment (BIT, HMRC trials). **Belief:** respectful treatment leads to more kept plans. No study isolates this for live calls, so we measure it: kept-promise rate and complaint rate.
+
+   </details>
+
+5. **Collaboration over closing.** Understand the debtor's situation before proposing terms, and offer the options neutrally. "Not now" is acceptable: we send the options in writing and call back at their chosen time.
+
+   <details><summary>Evidence</summary>
+
+   **Guidance:** listen first and fit the plan to circumstances (FCA CONC 7.3.4; Money Advice Trust IDEA). Respect opt-outs and contact preferences (circular 5/2022 § 5). **Research:** debtors prompted to contact their creditor themselves repaid more ("Call first, pay later", *Behavioural Public Policy*). **Law:** an agreed plan binds the creditor (1988 act § 13 / new act § 27), so a plan the debtor can't keep is costly.
+
+   </details>
+
+6. **Honest about limits over seamless.** The agent says it is an AI and what it can and can't agree to. Every "no" comes with a reason and the options that *are* available. "I don't know" beats a plausible guess.
+
+   <details><summary>Evidence</summary>
+
+   **Law:** communication must be correct and understandable (new act § 15). **Guidance:** EU AI Act Art. 50 requires disclosing an AI at first contact (in force in the EU, not yet in Norway); FCA CONC 7.9.1, 7.11.
+
+   </details>
+
+7. **Written over spoken for anything binding.** Agreements, dispute outcomes and payment details go in writing. Payment details are never asked for on the call.
+
+   <details><summary>Evidence</summary>
+
+   **Law:** written confirmation of each instalment date and amount (new act § 16(4)); a written, reasoned answer to disputes (§ 25). **Brief:** "send a written follow-up".
+
+   </details>
+
+Concrete rules: [rulebook.md](rulebook.md). Enforcement: [architecture.md](architecture.md).
 
 ## Goals (prototype)
 

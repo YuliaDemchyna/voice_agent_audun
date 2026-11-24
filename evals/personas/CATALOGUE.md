@@ -124,7 +124,8 @@ behaviour.
     run passed. The first baseline (`evals/results/13-baseline-3x`) passed
     13/15 runs. The flaky checks were the stop-contact preference in
     `reluctant_call01` and the `financial_difficulty` flag in `tight_budget`,
-    each 2/3.
+    each 2/3. Both are fixed (runs 14–19): two rounds of 3 runs after the
+   fixes passed 30/30 (`18-flaky-fixes-v4-3x`, `19-confirm-3x`).
 7. **Simulated debtors are too cooperative.** This is a known limitation and
 
    a non-goal ([product.md](../../docs/product.md#non-goals)): synthetic data

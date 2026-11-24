@@ -1,6 +1,6 @@
 # Evaluation criteria (proposal for review)
 
-**Status:** confirmed by Yulia (2026-11-24) and implemented in
+**Status:** confirmed by Yulia (2026-11-24) and implemented; tuning results in [REPORT.md](REPORT.md) in
 `evals/harness/` (`metrics.ts`, `simulate.ts`). Tuning budget: at most 4
 committed prompt iterations after the baseline, re-running only the failing
 personas, and a full run at the end. Results: `evals/results/20-*` onward. It defines what "the agent performs well" means and how each

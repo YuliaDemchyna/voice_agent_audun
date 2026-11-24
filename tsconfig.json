@@ -10,5 +10,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["backend", "agent", "evals"]
+  "include": ["backend", "agent", "evals", "web/build.ts"]
 }

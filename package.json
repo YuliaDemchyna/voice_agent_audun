@@ -9,8 +9,9 @@
     "test": "vitest run",
     "dev": "tsx watch backend/api/server.ts",
     "start": "tsx backend/api/server.ts",
-    "typecheck": "tsc --noEmit",
-    "evals": "vitest run --config evals/vitest.config.ts"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p web",
+    "evals": "vitest run --config evals/vitest.config.ts",
+    "vapi:sync": "tsx agent/sync-vapi.ts"
   },
   "repository": {
     "type": "git",
@@ -25,11 +26,13 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^1.13.0",
     "@hono/node-server": "^2.1.11",
+    "@vapi-ai/web": "^3.1.1",
     "hono": "^4.13.21",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
+    "esbuild": "^0.28.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.1.1"

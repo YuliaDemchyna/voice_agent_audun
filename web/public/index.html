@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Collection call prototype</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Collection call prototype</h1>
+    <div class="controls">
+      <button id="start">1. Start contact</button>
+      <button id="call" disabled>2. Start call</button>
+      <button id="hangup" disabled>End call</button>
+      <span id="status">idle</span>
+    </div>
+  </header>
+  <main>
+    <section>
+      <h2>Live transcript</h2>
+      <div id="transcript" class="panel"></div>
+    </section>
+    <section>
+      <h2>Debtor's phone (mock SMS)</h2>
+      <div id="sms" class="panel phone"></div>
+      <h2>Session</h2>
+      <pre id="session" class="panel small"></pre>
+    </section>
+    <section>
+      <h2>Event log</h2>
+      <div id="events" class="panel small"></div>
+      <h2>Escalation tickets</h2>
+      <pre id="tickets" class="panel small"></pre>
+    </section>
+  </main>
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

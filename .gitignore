@@ -32,3 +32,6 @@ evals/.cache/
 .DS_Store
 .idea/
 .vscode/
+
+# Built UI bundle
+web/dist/

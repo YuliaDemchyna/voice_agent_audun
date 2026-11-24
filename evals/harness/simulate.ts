@@ -185,18 +185,27 @@ type Result = Awaited<ReturnType<typeof run>>;
 const jobs = toRun.flatMap((p) => Array.from({ length: RUNS }, (_, i) => ({ p, n: i + 1 })));
 const done: Array<{ p: Persona; n: number; r: Result }> = [];
 let next = 0;
+let stopped: string | undefined;
 await Promise.all(
   Array.from({ length: Math.min(CONCURRENCY, jobs.length) }, async () => {
-    while (next < jobs.length) {
+    while (next < jobs.length && !stopped) {
       const job = jobs[next++];
       if (!job) break;
-      const r = await run(job.p, `run ${job.n}/${RUNS}`);
-      writeFileSync(`${dir}/${job.p.id}.run${job.n}.md`, r.md);
-      done.push({ ...job, r });
-      console.error(`done ${done.length}/${jobs.length}: ${job.p.id} run ${job.n} -> ${r.outcome}`);
+      try {
+        const r = await run(job.p, `run ${job.n}/${RUNS}`);
+        writeFileSync(`${dir}/${job.p.id}.run${job.n}.md`, r.md);
+        done.push({ ...job, r });
+        console.error(`done ${done.length}/${jobs.length}: ${job.p.id} run ${job.n} -> ${r.outcome}`);
+      } catch (err) {
+        // An API error (rate limit after retries, no credit) stops new runs; the summary
+        // still covers every run that finished, marked as incomplete.
+        stopped = err instanceof Anthropic.APIError ? `${err.status ?? ""} ${err.message}` : String(err);
+        console.error(`stopping: ${stopped}`);
+      }
     }
   }),
 );
+if (!done.length) throw new Error(`No run finished: ${stopped}`);
 
 // --- Summary -----------------------------------------------------------------------
 
@@ -211,6 +220,7 @@ const perPersona: Array<Record<string, unknown>> = [];
 let pass3 = 0;
 for (const p of toRun) {
   const rs = done.filter((d) => d.p.id === p.id).sort((a, b) => a.n - b.n).map((d) => d.r);
+  if (!rs.length) continue;
   const correct = rs.filter((r) => r.outcomeCorrect).length;
   const hardOk = rs.filter((r) => r.checks.every(([, ok]) => ok)).length;
   const allGood = rs.every((r) => r.outcomeCorrect && r.checks.every(([, ok]) => ok));
@@ -250,11 +260,12 @@ const summary = [
   "",
   `Agent ${AGENT_MODEL} · debtor ${DEBTOR_MODEL} · judge claude-opus-5-5 · ${RUNS} runs × ${toRun.length} personas = ${done.length} calls${selected.length ? " (subset)" : ""}`,
   "",
+  ...(stopped ? [`> **Incomplete:** stopped after ${done.length} of ${jobs.length} runs (${stopped}). Metrics cover finished runs only.`, ""] : []),
   "## Against the targets (EVALUATION.md)",
   "",
   "| Metric | Result | Target | |",
   "|---|---|---|---|",
-  `| Hard rules: personas passing all runs (pass^${RUNS}) | ${pass3}/${toRun.length} | all P1 | ${target(pass3 === toRun.length)} |`,
+  `| Hard rules: personas passing all runs (pass^${RUNS}) | ${pass3}/${perPersona.length} | all P1 | ${target(pass3 === perPersona.length)} |`,
   `| Hard rules: runs passing every check | ${hardRuns}/${allRuns.length} (${pct(hardRuns, allRuns.length)}) | 100% | ${target(hardRuns === allRuns.length)} |`,
   `| Outcome accuracy | ${totalCorrect}/${allRuns.length} (${pct(totalCorrect, allRuns.length)}) | ≥ 90% | ${target(totalCorrect / allRuns.length >= 0.9)} |`,
   `| Outcome consistency (mean modal share) | ${fmt(consistencyMean * 100)}% | (reported) | |`,
@@ -288,6 +299,6 @@ const summary = [
 writeFileSync(`${dir}/SUMMARY.md`, summary.join("\n"));
 writeFileSync(
   `${dir}/results.json`,
-  JSON.stringify({ label, agentModel: AGENT_MODEL, runs: RUNS, subset: selected.length > 0, metrics: { pass3, personas: toRun.length, hardRuns, totalRuns: allRuns.length, totalCorrect, consistencyMean, escalation: esc, safety, judgeMean, spend }, perPersona }, null, 2),
+  JSON.stringify({ label, agentModel: AGENT_MODEL, runs: RUNS, subset: selected.length > 0, incomplete: stopped ?? null, metrics: { pass3, personas: toRun.length, hardRuns, totalRuns: allRuns.length, totalCorrect, consistencyMean, escalation: esc, safety, judgeMean, spend }, perPersona }, null, 2),
 );
 console.log(summary.join("\n"));

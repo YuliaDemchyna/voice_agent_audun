@@ -10,6 +10,7 @@ const PRIORITY: Record<string, string> = {
   financial_difficulty: "P3",
   dispute: "P2",
   requested_human: "P2",
+  complaint: "P2",
   contact_preference: "P2",
   agent_error: "P2",
   debt_adviser: "P3",

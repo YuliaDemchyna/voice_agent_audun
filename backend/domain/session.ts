@@ -27,6 +27,7 @@ export const ESCALATION_REASONS = [
   "out_of_policy",
   "verification_failed",
   "recording_declined",
+  "complaint",
   "agent_error",
 ] as const;
 export type EscalationReason = (typeof ESCALATION_REASONS)[number];
@@ -280,12 +281,16 @@ export function confirmAgreement(session: Session, args: ConfirmArgs, ctx: Conte
 
 const ESCALATION_SCRIPT: Partial<Record<EscalationReason, { say: string; sms: (s: Session) => string }>> = {
   contact_preference: {
-    say: "Confirm you've recorded that they don't want calls from us. Be honest: you can't promise there will never be written contact about the claim; a colleague will review the request and reply once. Then close the call.",
-    sms: (s) => `${COLLECTOR_NAME}: we have recorded your request not to be called about ref ${s.claim.reference}. A colleague will review it. Questions: ${CONTACT_PHONE}.`,
+    say: "Say, in your own words but keeping the meaning: \"I understand, and I've noted it. We'll follow up with a written message, because the claim is still open. If you think this claim is wrong, please reply in writing. Have a good day.\" Then end the call.",
+    sms: (s) => `${COLLECTOR_NAME}: we have noted your request not to be called about ref ${s.claim.reference}. Because the claim is still open, we will follow up in writing. If you think this claim is wrong, please reply in writing. Questions: ${CONTACT_PHONE}.`,
   },
   recording_declined: {
     say: "Say exactly this, in full: \"Of course. I'm an AI assistant, so I can't handle this call without recording. A person from our team will be in touch with you instead.\" Do not mention the reason for the call and do not say goodbye yourself. Only after you have said it, end the call.",
     sms: () => `${COLLECTOR_NAME}: thank you for your time. A colleague will contact you without recording. You can also call us on ${CONTACT_PHONE}.`,
+  },
+  complaint: {
+    say: "Acknowledge the complaint without being defensive. Say a person will look at it and reply within a week. Ask if there's anything else they want them to know.",
+    sms: (s) => `${COLLECTOR_NAME}: we have received your complaint${s.verified ? ` about ref ${s.claim.reference}` : ""}. A person will look at it and reply within 1 week. Questions: ${CONTACT_PHONE}.`,
   },
   crisis: {
     say: "Stay calm and kind. Mention Mental Helse's helpline, 116 123. Tell them a person from the team will reach out, and do not talk about the claim.",

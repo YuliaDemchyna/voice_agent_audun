@@ -55,7 +55,7 @@ export const toolSchemas = {
     }),
   },
   escalate: {
-    description: "Hand the case to a human reviewer. Use for disputes, hardship, money trouble the person can still talk about (financial_difficulty: flags for review, the call continues), crisis, confusion, requests for a person, debt advisers, out-of-policy requests the person wants reviewed, or when the person does not want the call recorded.",
+    description: "Hand the case to a human reviewer. Use for disputes, hardship, money trouble the person can still talk about (financial_difficulty: flags for review, the call continues), crisis, confusion, requests for a person, debt advisers, out-of-policy requests the person wants reviewed, complaints, or when the person does not want the call recorded.",
     input: z.object({
       reason: z.enum(ESCALATION_REASONS),
       summary: z.string().describe("One or two sentences for the reviewer"),

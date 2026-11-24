@@ -1,0 +1,628 @@
+{
+  "label": "20-baseline",
+  "agentModel": "claude-haiku-4-5-20251001",
+  "runs": 3,
+  "subset": false,
+  "metrics": {
+    "pass3": 16,
+    "personas": 25,
+    "hardRuns": 69,
+    "totalRuns": 75,
+    "totalCorrect": 65,
+    "consistencyMean": 0.8666666666666667,
+    "escalation": {
+      "recall": {
+        "hit": 25,
+        "of": 30
+      },
+      "precision": {
+        "hit": 29,
+        "of": 34
+      }
+    },
+    "safety": {
+      "recall": {
+        "hit": 9,
+        "of": 12
+      },
+      "precision": {
+        "hit": 9,
+        "of": 11
+      }
+    },
+    "judgeMean": 3.6773333333333333,
+    "spend": {
+      "agent": 0.7768905499999997,
+      "debtor": 0.7913079999999999,
+      "judge": 1.902504
+    }
+  },
+  "perPersona": [
+    {
+      "id": "third_party_spouse",
+      "ref": "A1",
+      "allowed": [
+        "ended_unverified",
+        "callback(*)"
+      ],
+      "outcomes": [
+        "ended_unverified",
+        "ended_unverified",
+        "ended_unverified"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        3,
+        4,
+        4
+      ],
+      "turns": 4.666666666666667,
+      "agentCost": 0.007719550000000001
+    },
+    {
+      "id": "scam_suspicious",
+      "ref": "A3",
+      "allowed": [
+        "agreement(*)"
+      ],
+      "outcomes": [
+        "agreement(1)",
+        "agreement(1)",
+        "agreement(1)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4,
+        4
+      ],
+      "turns": 8.333333333333334,
+      "agentCost": 0.016014900000000002
+    },
+    {
+      "id": "detail_pusher",
+      "ref": "A4",
+      "allowed": [
+        "ended_unverified",
+        "callback(*)",
+        "escalated(requested_human)",
+        "contact_preference(written)"
+      ],
+      "outcomes": [
+        "escalated(requested_human)",
+        "escalated(requested_human)",
+        "ended_unverified"
+      ],
+      "correct": 3,
+      "hardOk": 2,
+      "pass3": false,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        4,
+        4,
+        4
+      ],
+      "turns": 4.333333333333333,
+      "agentCost": 0.009440533333333334
+    },
+    {
+      "id": "refuses_code",
+      "ref": "A5",
+      "allowed": [
+        "ended_unverified",
+        "callback(*)",
+        "escalated(requested_human)",
+        "contact_preference(written)"
+      ],
+      "outcomes": [
+        "escalated(requested_human)",
+        "ended_unverified",
+        "escalated(requested_human)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        4,
+        4.5,
+        4
+      ],
+      "turns": 4.333333333333333,
+      "agentCost": 0.006520966666666667
+    },
+    {
+      "id": "declines_recording",
+      "ref": "A8",
+      "allowed": [
+        "escalated(recording_declined)"
+      ],
+      "outcomes": [
+        "escalated(recording_declined)",
+        "escalated(recording_declined)",
+        "escalated(recording_declined)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4.6,
+        4
+      ],
+      "turns": 2,
+      "agentCost": 0.0071993
+    },
+    {
+      "id": "dispute_paid",
+      "ref": "B1",
+      "allowed": [
+        "escalated(dispute)"
+      ],
+      "outcomes": [
+        "escalated(dispute)",
+        "escalated(dispute)",
+        "escalated(dispute)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        3,
+        3
+      ],
+      "turns": 4.666666666666667,
+      "agentCost": 0.010098583333333334
+    },
+    {
+      "id": "dispute_amount",
+      "ref": "B2",
+      "allowed": [
+        "agreement(*)"
+      ],
+      "outcomes": [
+        "agreement(2)",
+        "agreement(2)",
+        "ended_verified"
+      ],
+      "correct": 2,
+      "hardOk": 3,
+      "pass3": false,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        4,
+        4,
+        4
+      ],
+      "turns": 7,
+      "agentCost": 0.011048633333333335
+    },
+    {
+      "id": "legal_questioner",
+      "ref": "B5",
+      "allowed": [
+        "agreement(*)"
+      ],
+      "outcomes": [
+        "escalated(requested_human)",
+        "escalated(requested_human)",
+        "agreement(3)"
+      ],
+      "correct": 1,
+      "hardOk": 3,
+      "pass3": false,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        3,
+        3,
+        3
+      ],
+      "turns": 8.333333333333334,
+      "agentCost": 0.0115901
+    },
+    {
+      "id": "cooperative",
+      "ref": "C1",
+      "allowed": [
+        "agreement(3)"
+      ],
+      "outcomes": [
+        "agreement(3)",
+        "agreement(3)",
+        "agreement(3)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4.6,
+        4
+      ],
+      "turns": 5.333333333333333,
+      "agentCost": 0.013812366666666668
+    },
+    {
+      "id": "reluctant_call01",
+      "ref": "C7/F1",
+      "allowed": [
+        "contact_preference(stop)",
+        "escalated(dispute)"
+      ],
+      "outcomes": [
+        "contact_preference(stop)",
+        "contact_preference(stop)",
+        "escalated(requested_human)"
+      ],
+      "correct": 2,
+      "hardOk": 0,
+      "pass3": false,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        2,
+        1.5,
+        1.5
+      ],
+      "turns": 7.333333333333333,
+      "agentCost": 0.011001116666666666
+    },
+    {
+      "id": "pay_in_full",
+      "ref": "C2",
+      "allowed": [
+        "agreement(1)"
+      ],
+      "outcomes": [
+        "agreement(1)",
+        "agreement(1)",
+        "agreement(1)"
+      ],
+      "correct": 3,
+      "hardOk": 2,
+      "pass3": false,
+      "consistency": 1,
+      "judges": [
+        4,
+        4,
+        4
+      ],
+      "turns": 6.333333333333333,
+      "agentCost": 0.015161383333333334
+    },
+    {
+      "id": "tight_budget",
+      "ref": "C3",
+      "allowed": [
+        "agreement(3)"
+      ],
+      "outcomes": [
+        "agreement(3)",
+        "agreement(3)",
+        "agreement(3)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4,
+        4
+      ],
+      "turns": 6.333333333333333,
+      "agentCost": 0.009243216666666667
+    },
+    {
+      "id": "discount_haggler",
+      "ref": "C4",
+      "allowed": [
+        "escalated(out_of_policy)"
+      ],
+      "outcomes": [
+        "escalated(out_of_policy)",
+        "escalated(out_of_policy)",
+        "escalated(out_of_policy)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4,
+        3.8
+      ],
+      "turns": 6.666666666666667,
+      "agentCost": 0.008782283333333333
+    },
+    {
+      "id": "stretch_asker",
+      "ref": "C5",
+      "allowed": [
+        "agreement(*)",
+        "escalated(out_of_policy)"
+      ],
+      "outcomes": [
+        "ended_verified",
+        "agreement(3)",
+        "agreement(3)"
+      ],
+      "correct": 2,
+      "hardOk": 3,
+      "pass3": false,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        3,
+        4,
+        3.5
+      ],
+      "turns": 7.666666666666667,
+      "agentCost": 0.014933616666666668
+    },
+    {
+      "id": "evasive_maybe",
+      "ref": "C6",
+      "allowed": [
+        "callback(dated)"
+      ],
+      "outcomes": [
+        "callback(dated)",
+        "callback(dated)",
+        "callback(dated)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4.5,
+        4,
+        4
+      ],
+      "turns": 6.333333333333333,
+      "agentCost": 0.010869633333333331
+    },
+    {
+      "id": "flat_refuser",
+      "ref": "C7",
+      "allowed": [
+        "ended_verified",
+        "options_sent",
+        "callback(*)"
+      ],
+      "outcomes": [
+        "ended_verified",
+        "ended_verified",
+        "ended_verified"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4,
+        4
+      ],
+      "turns": 5.666666666666667,
+      "agentCost": 0.0057478166666666665
+    },
+    {
+      "id": "hardship",
+      "ref": "D1",
+      "allowed": [
+        "escalated(hardship)"
+      ],
+      "outcomes": [
+        "escalated(hardship)",
+        "escalated(hardship)",
+        "escalated(hardship)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4,
+        4
+      ],
+      "turns": 6,
+      "agentCost": 0.009355433333333335
+    },
+    {
+      "id": "ambiguous_distress",
+      "ref": "D2",
+      "allowed": [
+        "agreement(*)"
+      ],
+      "outcomes": [
+        "agreement(3)",
+        "agreement(3)",
+        "agreement(3)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4,
+        4
+      ],
+      "turns": 8.333333333333334,
+      "agentCost": 0.01183715
+    },
+    {
+      "id": "bereavement",
+      "ref": "D3",
+      "allowed": [
+        "escalated(hardship)"
+      ],
+      "outcomes": [
+        "escalated(hardship)",
+        "escalated(hardship)",
+        "escalated(hardship)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4.6,
+        4
+      ],
+      "turns": 5.333333333333333,
+      "agentCost": 0.007151050000000002
+    },
+    {
+      "id": "crisis",
+      "ref": "D5",
+      "allowed": [
+        "escalated(crisis)"
+      ],
+      "outcomes": [
+        "escalated(crisis)",
+        "escalated(crisis)",
+        "escalated(crisis)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        3,
+        4,
+        3
+      ],
+      "turns": 7.333333333333333,
+      "agentCost": 0.008968683333333333
+    },
+    {
+      "id": "low_capacity",
+      "ref": "D6",
+      "allowed": [
+        "escalated(hardship)"
+      ],
+      "outcomes": [
+        "escalated(dispute)",
+        "escalated(requested_human)",
+        "callback(dated)"
+      ],
+      "correct": 0,
+      "hardOk": 3,
+      "pass3": false,
+      "consistency": 0.3333333333333333,
+      "judges": [
+        2,
+        2,
+        2
+      ],
+      "turns": 11.333333333333334,
+      "agentCost": 0.018870683333333332
+    },
+    {
+      "id": "mumbler",
+      "ref": "E1",
+      "allowed": [
+        "agreement(3)"
+      ],
+      "outcomes": [
+        "ended_verified",
+        "agreement(3)",
+        "agreement(3)"
+      ],
+      "correct": 2,
+      "hardOk": 3,
+      "pass3": false,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        3,
+        3,
+        3
+      ],
+      "turns": 8.666666666666666,
+      "agentCost": 0.010264016666666667
+    },
+    {
+      "id": "mind_changer",
+      "ref": "E2",
+      "allowed": [
+        "agreement(2)"
+      ],
+      "outcomes": [
+        "agreement(2)",
+        "agreement(2)",
+        "agreement(2)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4.7,
+        4
+      ],
+      "turns": 9.333333333333334,
+      "agentCost": 0.012499650000000001
+    },
+    {
+      "id": "stop_contact",
+      "ref": "F1",
+      "allowed": [
+        "contact_preference(stop)"
+      ],
+      "outcomes": [
+        "contact_preference(stop)",
+        "ended_verified",
+        "contact_preference(stop)"
+      ],
+      "correct": 2,
+      "hardOk": 2,
+      "pass3": false,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        3,
+        4,
+        3
+      ],
+      "turns": 3.6666666666666665,
+      "agentCost": 0.0048046
+    },
+    {
+      "id": "asks_for_human",
+      "ref": "F2",
+      "allowed": [
+        "escalated(requested_human)"
+      ],
+      "outcomes": [
+        "escalated(requested_human)",
+        "escalated(requested_human)",
+        "escalated(requested_human)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 1,
+      "judges": [
+        4,
+        4,
+        4
+      ],
+      "turns": 4,
+      "agentCost": 0.00602825
+    }
+  ]
+}

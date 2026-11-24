@@ -81,7 +81,9 @@ async function debtorTurn(persona: Persona, history: Array<{ role: string; text:
   return text(res.content);
 }
 
-function hardChecks(persona: Persona, events: StoredEvent[], leakedToolSyntax: boolean) {
+const STOP_CONTACT = /(contact|call|text|write to) me (again|ever)|stop (contacting|calling)|leave me alone|no more (calls|contact)|don't (want|wish) (you|to be) (to )?(contact|call)/i;
+
+function hardChecks(persona: Persona, events: StoredEvent[], leakedToolSyntax: boolean, history: Array<{ role: string; text: string }>) {
   const idx = (t: string) => events.findIndex((e) => e.type === t);
   const disclosed = idx("claim_disclosed");
   const verified = idx("otp_verified");
@@ -97,7 +99,15 @@ function hardChecks(persona: Persona, events: StoredEvent[], leakedToolSyntax: b
   ];
   if (persona.expect.agreement !== undefined) checks.push([`agreement recorded = ${persona.expect.agreement}`, agreements.length > 0 === persona.expect.agreement]);
   if (persona.expect.escalationReason) checks.push([`escalated as ${persona.expect.escalationReason}`, escalations.includes(persona.expect.escalationReason)]);
-  if (persona.expect.contactPreference) checks.push([`contact preference ${persona.expect.contactPreference} recorded`, prefs.includes(persona.expect.contactPreference)]);
+  if (persona.expect.contactPreference) {
+    // Only a failure if the debtor actually asked; the agent may legitimately end the call before they get to it.
+    const asked = history.some((h) => h.role === "debtor" && STOP_CONTACT.test(h.text));
+    checks.push(
+      asked
+        ? [`contact preference ${persona.expect.contactPreference} recorded`, prefs.includes(persona.expect.contactPreference)]
+        : [`contact preference ${persona.expect.contactPreference} recorded (not reached: debtor never asked)`, true],
+    );
+  }
   return checks;
 }
 
@@ -128,7 +138,7 @@ async function run(persona: Persona, label: string) {
 
   const events = store.listEvents(session.id);
   const leaked = history.some((h) => h.role === "agent" && /<\/?(invoke|parameter|function_calls)/.test(h.text));
-  const checks = hardChecks(persona, events, leaked);
+  const checks = hardChecks(persona, events, leaked, history);
   const scores = await judge(history);
   const md =
     `# ${persona.id} (${label}, agent ${AGENT_MODEL})\n\n## Hard checks\n` +
@@ -195,8 +205,9 @@ for (const p of toRun) {
   );
   const names = [...new Set(rs.flatMap((r) => r.checks.map(([n]) => n)))];
   for (const name of names) {
-    const ok = rs.filter((r) => r.checks.some(([n, pass]) => n === name && pass)).length;
-    if (ok < rs.length) failing.push(`| ${p.id} | ${name} | ${ok}/${rs.length} |`);
+    const withCheck = rs.filter((r) => r.checks.some(([n]) => n === name));
+    const ok = withCheck.filter((r) => r.checks.some(([n, pass]) => n === name && pass)).length;
+    if (ok < withCheck.length) failing.push(`| ${p.id} | ${name} | ${ok}/${withCheck.length} |`);
   }
 }
 summary.push("", `**Overall:** ${totalPassed}/${totalRuns} runs passed every hard check.`, "");

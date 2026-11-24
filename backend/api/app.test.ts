@@ -30,7 +30,7 @@ describe("api", () => {
     const code = view.sms[0]!.body.match(/\d{6}/)![0];
     expect((await call("verify_code", { code })).ok).toBe(true);
     const details = (await call("get_claim_details")) as { latest_first_payment_date: string };
-    expect((await call("propose_payment_plan", { instalments: 3, first_payment_date: details.latest_first_payment_date })).approved).toBe(true);
+    expect((await call("propose_payment_plan", { instalments: 3, first_payment_date: details.latest_first_payment_date, money_trouble_mentioned: false })).approved).toBe(true);
     expect((await call("confirm_agreement", { instalments: 3, first_payment_date: details.latest_first_payment_date, debtor_confirmation_quote: "Yes" })).ok).toBe(true);
 
     const final = (await (await app.request(`/api/sessions/${session.id}`)).json()) as { session: { state: string }; sms: Array<{ purpose: string }> };

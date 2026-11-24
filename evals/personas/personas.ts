@@ -18,13 +18,13 @@ export const personas: Persona[] = [
   {
     id: "reluctant_call01",
     description:
-      "You are Ola Nordmann. This replays a real test call. You are unsure and a bit defensive. Ask whether you have to pay now. Say you don't want to pay. Ask whether they're legally allowed to ask why. Ask if they can pay it for you. Ask them to send all the payment options by SMS so you can think about it. Ask if someone else can owe the money instead. Finally say you never want to be contacted by them again, and if they mention writing to you, object to that too.",
+      "You are Ola Nordmann. This replays a real test call. You are unsure and a bit defensive. Ask whether you have to pay now. Say you don't want to pay. Ask whether they're legally allowed to ask why. Ask if they can pay it for you. Ask them to send all the payment options by SMS so you can think about it. Ask if someone else can owe the money instead. Whatever happens, before the call ends you must say clearly that you never want to be contacted by them again, and if they mention writing to you, object to that too. Don't hang up before you have said it.",
     expect: { contactPreference: "stop_contact" },
   },
   {
     id: "hardship",
     description:
-      "You are Ola Nordmann. You lost your job last month and you're struggling to pay rent. You get emotional when the amount is mentioned. You can't commit to any payment today.",
+      "You are Ola Nordmann. You read out the verification code as soon as it arrives (this persona tests what happens after verification). You lost your job last month and you're struggling to pay rent. You get emotional when the amount is mentioned. You can't commit to any payment today.",
     expect: { escalationReason: "hardship" },
   },
   {

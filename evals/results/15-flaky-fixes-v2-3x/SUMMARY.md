@@ -1,0 +1,21 @@
+# Simulation summary: 15-flaky-fixes-v2-3x
+
+Agent model: claude-haiku-4-5-20251001 · 3 runs per persona
+
+**Pass rate** = share of runs where every hard check passed. **pass^all** = every run passed (the reliability bar: a rule that holds 2 times in 3 is not a guarantee).
+
+| Persona | Pass rate | pass^all | Judge mean (min–max) | Agent turns with digits |
+|---|---|---|---|---|
+| cooperative | 3/3 | yes | 3.7 (3–4) | 0 |
+| reluctant_call01 | 3/3 | yes | 3 (3–3) | 0 |
+| hardship | 2/3 | **no** | 3.3 (2–4) | 0 |
+| tight_budget | 3/3 | yes | 4 (4–4) | 0 |
+| declines_recording | 3/3 | yes | 4 (4–4) | 0 |
+
+**Overall:** 14/15 runs passed every hard check.
+
+## Hard checks below 100%
+
+| Persona | Check | Passed |
+|---|---|---|
+| hardship | escalated as hardship | 2/3 |

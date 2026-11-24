@@ -201,9 +201,23 @@ export interface ProposeArgs {
   instalments: number;
   first_payment_date: string;
   total_amount_nok?: number;
+  /** Required in the tool schema, so the model answers it on every proposal (a separate escalate call was skipped 1 run in 3). */
+  money_trouble_mentioned?: boolean;
 }
 
+/** E2 split: a plan agreed under money trouble is flagged for a person to check affordability. The backend raises the flag, not the model. */
 export function proposePaymentPlan(session: Session, args: ProposeArgs, ctx: Context): ToolOutcome {
+  const alreadyFlagged = session.escalations.some((e) => e.reason === "financial_difficulty" || e.reason === "hardship");
+  if (args.money_trouble_mentioned && !alreadyFlagged && session.verified && !session.negotiationLocked) {
+    const escalation: Escalation = { reason: "financial_difficulty", summary: "Plan proposed after the person mentioned money trouble; check affordability." };
+    const flagged = { ...session, escalations: [...session.escalations, escalation] };
+    const out = proposePlanChecked(flagged, args, ctx);
+    return { ...out, events: [{ type: "escalated", escalation, locked: false }, ...out.events] };
+  }
+  return proposePlanChecked(session, args, ctx);
+}
+
+function proposePlanChecked(session: Session, args: ProposeArgs, ctx: Context): ToolOutcome {
   if (!session.verified) return rejected(session, "propose_payment_plan", "Not verified.");
   if (session.negotiationLocked) return rejected(session, "propose_payment_plan", "Negotiation is closed for this call because the case was escalated. Do not discuss payment.");
   if (session.state === "agreed") return rejected(session, "propose_payment_plan", "An agreement is already recorded.");
@@ -322,6 +336,28 @@ export function escalate(session: Session, escalation: Escalation): ToolOutcome 
       { type: "sms_sent", to: session.debtor.phone, purpose: "escalation_note", body },
     ],
     result: { ok: true, message: say + (locked ? " Do not discuss payment any further." : "") },
+  };
+}
+
+/**
+ * An escalation for another reason can come with a stop-contact request in the same breath
+ * ("this isn't mine, and don't contact me again"). The tool makes the model answer
+ * contact_preference_requested on every escalation, and the backend records it here,
+ * because a separate record_contact_preference call was skipped (sim run 14).
+ */
+export function escalateWithContactPreference(
+  session: Session,
+  escalation: Escalation,
+  preference: "none" | "stop_contact" | "written_only",
+): ToolOutcome {
+  const out = escalate(session, escalation);
+  if (preference === "none" || escalation.reason === "contact_preference") return out;
+  const pref: Escalation = { reason: "contact_preference", summary: `Debtor asked for: ${preference}.`, debtorQuote: escalation.debtorQuote };
+  const script = ESCALATION_SCRIPT.contact_preference!;
+  return {
+    session: { ...out.session, negotiationLocked: true, approvedPlan: undefined, escalations: [...out.session.escalations, pref] },
+    events: [...out.events, { type: "contact_preference_recorded", preference }, { type: "escalated", escalation: pref, locked: true }],
+    result: { ok: true, message: `${String(out.result.message)} They also asked for ${preference === "stop_contact" ? "no more contact" : "written contact only"}, which is now recorded. ${script.say}` },
   };
 }
 

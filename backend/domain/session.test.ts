@@ -3,6 +3,7 @@ import { demoClaim, demoDebtor } from "./claim.js";
 import {
   confirmAgreement,
   escalate,
+  escalateWithContactPreference,
   getClaimDetails,
   newSession,
   proposePaymentPlan,
@@ -108,6 +109,23 @@ describe("escalation locks (N5, E1, E5)", () => {
     expect(out.events.some((e) => e.type === "sms_sent")).toBe(false);
     expect(out.session.escalations.map((e) => e.reason)).toContain("financial_difficulty");
     expect(proposePaymentPlan(out.session, { instalments: 3, first_payment_date: "2026-12-01" }, ctx).result.ok).toBe(true);
+  });
+
+  it("a plan proposed under money trouble raises the review flag once, without locking", () => {
+    let out = proposePaymentPlan(verified(), { instalments: 3, first_payment_date: "2026-12-01", money_trouble_mentioned: true }, ctx);
+    expect(out.result.ok).toBe(true);
+    expect(out.session.escalations.map((e) => e.reason)).toEqual(["financial_difficulty"]);
+    out = proposePaymentPlan(out.session, { instalments: 2, first_payment_date: "2026-12-01", money_trouble_mentioned: true }, ctx);
+    expect(out.session.escalations).toHaveLength(1);
+    expect(out.session.negotiationLocked).toBe(false);
+  });
+
+  it("records a stop-contact request that comes with another escalation (no second SMS)", () => {
+    const out = escalateWithContactPreference(verified(), { reason: "dispute", summary: "Says it isn't his." }, "stop_contact");
+    expect(out.events.filter((e) => e.type === "contact_preference_recorded")).toHaveLength(1);
+    expect(out.session.escalations.map((e) => e.reason)).toEqual(["dispute", "contact_preference"]);
+    expect(out.events.filter((e) => e.type === "sms_sent")).toHaveLength(1);
+    expect(out.session.negotiationLocked).toBe(true);
   });
 
   it("stop-contact escalates and locks", () => {

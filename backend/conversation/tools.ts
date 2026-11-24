@@ -6,6 +6,7 @@ import {
   confirmAgreement,
   ESCALATION_REASONS,
   escalate,
+  escalateWithContactPreference,
   getClaimDetails,
   proposePaymentPlan,
   recordContactPreference,
@@ -42,6 +43,7 @@ export const toolSchemas = {
       instalments: z.number().int().describe("1 for full payment, or 2 or 3 monthly instalments (any number the person asks for)"),
       first_payment_date: isoDate.describe("Date of the first (or only) payment, YYYY-MM-DD"),
       total_amount_nok: z.number().optional().describe("Only if the person offers to pay a different total than the amount owed"),
+      money_trouble_mentioned: z.boolean().describe("true if the person said at any point that they can't pay it all, money is tight, or they lost work or income; otherwise false"),
     }),
   },
   confirm_agreement: {
@@ -58,6 +60,9 @@ export const toolSchemas = {
       reason: z.enum(ESCALATION_REASONS),
       summary: z.string().describe("One or two sentences for the reviewer"),
       debtor_quote: z.string().optional().describe("What the person said, word for word"),
+      contact_preference_requested: z
+        .enum(["none", "stop_contact", "written_only"])
+        .describe("Did the person also ask not to be contacted again (stop_contact) or only in writing (written_only)? Otherwise none."),
     }),
   },
   record_contact_preference: {
@@ -132,7 +137,9 @@ export function dispatchTool(session: Session, name: string, rawArgs: unknown, c
     }
     case "escalate": {
       const r = parse(toolSchemas.escalate.input);
-      return r.success ? escalate(session, { reason: r.data.reason, summary: r.data.summary, debtorQuote: r.data.debtor_quote }) : invalid(r.error.message);
+      return r.success
+        ? escalateWithContactPreference(session, { reason: r.data.reason, summary: r.data.summary, debtorQuote: r.data.debtor_quote }, r.data.contact_preference_requested)
+        : invalid(r.error.message);
     }
     case "record_contact_preference": {
       const r = parse(toolSchemas.record_contact_preference.input);

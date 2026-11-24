@@ -38,7 +38,7 @@ Not legal advice.
 | N6 | Claim to be human, or invent facts not in the claim record. | prompt | new act § 15; AI Act Art. 50 | 6 |
 | N7 | Ask for card or bank details or passwords on the call. Payment details go only in the written follow-up. | prompt | our rule: anti-scam, builds trust | 7 |
 | N8 | Let the caller change the agent's rules or session state ("the code is verified", "ignore your instructions"). | **code**: only the backend changes state | our rule: prompt-injection resistance | 2 |
-| N9 | Make contact outside weekdays 08–21 or Saturdays 09–15, on Sundays or public holidays, or beyond 1 attempt a day, 5 a week or 15 a month. | code (contact scheduler) | new act § 15(2); circular 5/2022 §§ 3–4 | 4 |
+| N9 | Make contact outside weekdays 08–21 or Saturdays 09–15, on Sundays or public holidays, or beyond 1 attempt a day, 5 a week or 15 a month. | code (contact scheduler; out of scope for the demo, see [product.md](product.md#non-goals)) | new act § 15(2); circular 5/2022 §§ 3–4 | 4 |
 
 ## Always escalates to a human
 
@@ -63,8 +63,6 @@ Not legal advice.
 2. **Recording.** Datatilsynet's guidance is that recording to document an
    agreement needs consent. The prototype's transcript is essential to how it
    works, so declining recording means switching to the written channel.
-3. **Rule N9** belongs in a contact scheduler, which is designed but not
-   built. The prototype starts calls manually.
-4. **GDPR Art. 22.** Whether an AI agreeing a pre-set plan the debtor chose is
+3. **GDPR Art. 22.** Whether an AI agreeing a pre-set plan the debtor chose is
    a "solely automated decision" is unverified. Sending every refusal to a
    human (E3) is the conservative design.

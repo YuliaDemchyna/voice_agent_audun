@@ -62,7 +62,9 @@ designed-but-not-built.
 
 Real phone calls, real SMS or email delivery, Norwegian-language voice,
 multiple concurrent debtors, production auth, payment processing, creditor
-admin UI, multi-claim debtors.
+admin UI, multi-claim debtors, and a contact scheduler. The scheduler is
+where rulebook N9 (legal call hours and attempt limits) would be enforced; it
+is designed but not built, and in the demo calls are started manually.
 
 ## Success metrics
 

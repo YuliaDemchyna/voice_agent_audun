@@ -31,6 +31,8 @@
 | D3 | 2026-11-24 | Backend: **TypeScript + Hono**, one language across backend, web and evals | Accepted |
 | D4 | 2026-11-24 | Storage: **`node:sqlite`**, append-only `events` table | Accepted |
 | D5 | 2026-11-24 | Evals: **thin custom harness on Vitest** | Accepted |
+| D2a | 2026-11-24 | Agent model changed to **Claude Haiku 4.5** in voice and text mode, for latency first and price second | Accepted (supersedes the agent part of D2) |
+| D6 | 2026-11-24 | Voice: **Vapi "Clara"** (female) instead of ElevenLabs "sarah" | Accepted |
 
 ### D0: Repo layout
 
@@ -117,6 +119,46 @@
   and evals already compare it; (b) Sonnet 5 in both; (c) custom-LLM mode
   with Sonnet 5.5. That model mismatch between voice and text is
   one more reason to consider custom-LLM mode (see D1).
+
+### D2a: Agent model changed to Claude Haiku 4.5 (2026-11-24)
+
+- **Decision (Yulia, made in the Vapi dashboard after live test calls):** the
+  voice agent runs on `claude-haiku-4-5-20251001`. Text mode (`npm run sim`)
+  now defaults to the same model (`DEFAULT_AGENT_MODEL` in
+  `agent/assistant.ts`), which closes the voice/text mismatch noted in D2.
+- **Why:** first **latency**: a smaller model replies faster, and response
+  time matters most in a voice call. Second, **price**: a smaller model costs
+  much less per call, and this agent makes a lot of short turns.
+- **Why it's acceptable:** the hard rules (verification, policy, confirmation,
+  escalation locks) live in code, so a smaller model can't break them. It can
+  only do worse on soft behaviour, and that is what the evals measure.
+- **Tradeoff / to watch:** tone, hardship detection and spoken style may be
+  weaker. First run on Haiku 4.5 (`evals/results/07-haiku-4-5`, one run per
+  persona, so noisy): cooperative, reluctant and declines-recording held up
+  (judge 4, 3, 4 against 4.8, 3.5 and 4 on Sonnet 5), but **the hardship persona
+  failed a hard check**. Nora was kind and mentioned NAV, but never called
+  `escalate("hardship")`, so no ticket was raised for someone who said they
+  lost their job. That is a prompt gap the smaller model exposes, to fix
+  before relying on Haiku.
+- **Open question:** Haiku 5.5 is newer and listed at a lower price (see D2).
+  If Vapi offers it, it may be worth an eval comparison.
+
+### D6: Voice, Vapi "Clara" (2026-11-24)
+
+- **Options tried:** ElevenLabs "sarah" (from call 01), then Vapi's own voice
+  "Clara" (Vapi voice version 2, English).
+- **Decision (Yulia, after live calls):** Clara.
+- **Why:** sarah felt really awkward and unpleasant to listen to in live
+  calls. Clara sounds more natural. A female voice was kept on purpose,
+  because it is perceived as less threatening in a collections call (Yulia's
+  design call, not sourced; see [reviews/call-01.md](reviews/call-01.md)
+  finding 9).
+- **Tradeoff:** listening quality is a judgement from a few live calls, not a
+  measurement; text-mode evals can't test it. Vapi's built-in voice also
+  ties us a bit more to Vapi than a third-party TTS would.
+- **Also synced from the dashboard:** Vapi's post-call summary and success
+  evaluation are off (our event log, tickets and judge are the record), and
+  the server timeout is 20 seconds.
 
 ### D4: Storage, `node:sqlite`
 

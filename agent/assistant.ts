@@ -5,6 +5,9 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { toolJsonSchemas } from "../backend/conversation/tools.js";
 
+/** Voice agent model (D2, changed 2026-11-24 for latency and price). Text mode uses the same one. */
+export const DEFAULT_AGENT_MODEL = "claude-haiku-4-5-20251001";
+
 export const FIRST_MESSAGE =
   "Hi, this is Nora, an AI assistant calling from Nordvik Collections. This call is recorded and transcribed for quality; if you'd rather it wasn't, just say so. Am I speaking with Ola Nordmann?";
 
@@ -33,9 +36,13 @@ export function assistantConfig(opts: { serverUrl: string; model: string; secret
         { type: "endCall" },
       ],
     },
-    // Female voice (Yulia's design call: perceived as less threatening in this context).
-    voice: { provider: "11labs", voiceId: process.env.VAPI_VOICE_ID ?? "sarah" },
-    server,
+    // Female voice, perceived as less threatening here. Vapi's own "Clara" replaced
+    // ElevenLabs "sarah", which sounded awkward in live calls (D6).
+    voice: { provider: "vapi", voiceId: process.env.VAPI_VOICE_ID ?? "Clara", version: "2", language: "en" },
+    server: { ...server, timeoutSeconds: 20 },
+    // Vapi's post-call summary and success evaluation are off: the event log, tickets
+    // and our own judge are the record of the call.
+    analysisPlan: { summaryPlan: { enabled: false }, successEvaluationPlan: { enabled: false } },
     serverMessages: ["tool-calls", "status-update", "end-of-call-report"],
     endCallMessage: "Thank you, goodbye.",
   };

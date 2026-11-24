@@ -4,13 +4,13 @@
 // On first run it appends VAPI_ASSISTANT_ID to .env.
 
 import { appendFileSync } from "node:fs";
-import { assistantConfig } from "./assistant.js";
+import { assistantConfig, DEFAULT_AGENT_MODEL } from "./assistant.js";
 
 try { process.loadEnvFile(".env"); } catch { /* use the environment */ }
 
 const key = process.env.VAPI_PRIVATE_KEY;
 const serverUrl = process.env.PUBLIC_WEBHOOK_URL;
-const model = process.env.VAPI_MODEL ?? "claude-sonnet-5";
+const model = process.env.VAPI_MODEL ?? DEFAULT_AGENT_MODEL;
 if (!key) throw new Error("VAPI_PRIVATE_KEY is not set");
 if (!serverUrl) throw new Error("PUBLIC_WEBHOOK_URL is not set (start a tunnel to the backend first)");
 

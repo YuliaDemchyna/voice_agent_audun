@@ -6,7 +6,7 @@
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import Anthropic from "@anthropic-ai/sdk";
-import { FIRST_MESSAGE, systemPrompt } from "../../agent/assistant.js";
+import { DEFAULT_AGENT_MODEL, FIRST_MESSAGE, systemPrompt } from "../../agent/assistant.js";
 import { toolJsonSchemas } from "../../backend/conversation/tools.js";
 import { runTool, startSession } from "../../backend/services/runtime.js";
 import { Store, type StoredEvent } from "../../backend/services/store.js";
@@ -16,7 +16,7 @@ import { judge } from "./judge.js";
 try { process.loadEnvFile(".env"); } catch { /* use the environment */ }
 
 const client = new Anthropic();
-const AGENT_MODEL = process.env.AGENT_MODEL ?? process.env.VAPI_MODEL ?? "claude-sonnet-5";
+const AGENT_MODEL = process.env.AGENT_MODEL ?? process.env.VAPI_MODEL ?? DEFAULT_AGENT_MODEL;
 const DEBTOR_MODEL = "claude-sonnet-5-5";
 const MAX_TURNS = 14;
 

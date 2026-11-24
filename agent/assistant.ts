@@ -15,7 +15,7 @@ export function systemPrompt(): string {
 export function assistantConfig(opts: { serverUrl: string; model: string; secret?: string }) {
   const server = { url: `${opts.serverUrl.replace(/\/$/, "")}/vapi/webhook`, ...(opts.secret ? { secret: opts.secret } : {}) };
   return {
-    name: "Nordvik collections agent (Audun take-home)",
+    name: "Nordvik collections agent",
     firstMessage: FIRST_MESSAGE,
     model: {
       provider: "anthropic",

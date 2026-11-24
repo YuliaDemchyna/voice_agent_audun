@@ -49,17 +49,29 @@ how "hard rules are code" shows up in the folder structure.
 
 ## Running locally
 
-Requires Node 22.13+.
+Requires Node 22.13+, a Vapi account, an Anthropic key and a tunnel
+([ngrok](https://ngrok.com) or cloudflared). Vapi has to reach our tool
+webhook from the internet (assumption A7).
 
 ```bash
 npm install
-cp .env.example .env   # fill in ANTHROPIC_API_KEY and the Vapi keys
-npm run dev            # backend on http://localhost:8000
-npm test               # unit tests (no network)
-npm run evals          # simulated debtor conversations (calls real LLMs, costs money)
+cp .env.example .env          # fill in ANTHROPIC_API_KEY, VAPI_PUBLIC_KEY, VAPI_PRIVATE_KEY
+npm run dev                   # backend + UI on http://localhost:8000
+ngrok http 8000               # in a second terminal; copy the https URL
+# put that URL in .env as PUBLIC_WEBHOOK_URL, then:
+npm run vapi:sync             # creates the Vapi assistant from agent/ and saves VAPI_ASSISTANT_ID
+# restart `npm run dev` so it picks up VAPI_ASSISTANT_ID
 ```
 
-_The end-to-end demo steps (web UI, voice call) get added in Phase 3._
+Then open http://localhost:8000, click **Start contact**, then **Start call**,
+and allow the microphone. Say you are Ola Nordmann, then read the code from
+the mock SMS panel. Re-run `npm run vapi:sync` whenever the tunnel URL,
+prompt or tools change.
+
+```bash
+npm test                      # unit + API tests (no network)
+npm run evals                 # simulated debtor conversations (calls real LLMs; Phase 2)
+```
 
 ## Docs
 

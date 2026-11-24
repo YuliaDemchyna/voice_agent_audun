@@ -70,7 +70,8 @@ export type DomainEvent =
   | { type: "agreement_recorded"; plan: ApprovedPlan; confirmationQuote: string }
   | { type: "escalated"; escalation: Escalation; locked: boolean }
   | { type: "contact_preference_recorded"; preference: string; callbackTime?: string }
-  | { type: "sms_sent"; to: string; purpose: "otp" | "agreement_confirmation" | "escalation_note"; body: string }
+  | { type: "payment_options_sent" }
+  | { type: "sms_sent"; to: string; purpose: "otp" | "agreement_confirmation" | "escalation_note" | "payment_options"; body: string }
   | { type: "tool_rejected"; tool: string; reason: string };
 
 export interface ToolOutcome {
@@ -127,8 +128,8 @@ export function verifyCode(session: Session, code: string, ctx: Context): ToolOu
   if (result.ok) {
     return {
       session: { ...session, otp: state, verified: true, state: "verified" },
-      events: [{ type: "otp_verified" }],
-      result: { ok: true, message: "Identity verified. You may now call get_claim_details." },
+      events: [{ type: "otp_verified" }, { type: "claim_disclosed", claimId: session.claim.id }],
+      result: { ok: true, message: "Identity verified. The claim details are below; you may now explain them.", ...claimPayload(session, ctx) },
     };
   }
   const next: Session = { ...session, otp: state };
@@ -149,30 +150,46 @@ export function verifyCode(session: Session, code: string, ctx: Context): ToolOu
   return { session: next, events, result: { ok: false, error: hints[result.reason] } };
 }
 
+function claimPayload(session: Session, ctx: Context) {
+  const today = todayInOslo(new Date(ctx.now));
+  const c = session.claim;
+  return {
+    claim: {
+      reference: c.reference,
+      creditor: c.creditor,
+      description: c.description,
+      original_due_date: c.originalDueDate,
+      amount_owed_nok: c.amountNok,
+      breakdown: { principal_nok: c.breakdown.principalNok, interest_and_fees_to_date_nok: c.breakdown.interestAndFeesNok },
+      interest_note: "Interest and fees are frozen while an agreed plan is kept.",
+    },
+    today,
+    latest_first_payment_date: addDays(today, MAX_DAYS_TO_FIRST_PAYMENT),
+    options: availableOptions(c.amountNok, today),
+  };
+}
+
 export function getClaimDetails(session: Session, ctx: Context): ToolOutcome {
   if (!session.verified) {
     return rejected(session, "get_claim_details", "Not verified. Do not reveal anything about why you are calling; verify the one-time code first.");
   }
+  return { session, events: [{ type: "claim_disclosed", claimId: session.claim.id }], result: { ok: true, ...claimPayload(session, ctx) } };
+}
+
+/** Principle 5: "not now" is fine, so the options can always go out in writing (verified only). */
+export function sendPaymentOptions(session: Session, ctx: Context): ToolOutcome {
+  if (!session.verified) return rejected(session, "send_payment_options", "Not verified.");
+  if (session.negotiationLocked) return rejected(session, "send_payment_options", "Payment options can't be sent after this escalation.");
   const today = todayInOslo(new Date(ctx.now));
-  const c = session.claim;
+  const options = availableOptions(session.claim.amountNok, today).slice(0, 3);
+  const body =
+    `${COLLECTOR_NAME}: your options for ${session.claim.creditor}, ref ${session.claim.reference}, NOK ${session.claim.amountNok}:\n` +
+    options.map((o) => `- ${o}`).join("\n") +
+    `\nInterest and fees are frozen while an agreed plan is kept. To agree a plan or ask questions, call ${CONTACT_PHONE}. Free debt advice: NAV, 55 55 33 39.`;
   return {
     session,
-    events: [{ type: "claim_disclosed", claimId: c.id }],
-    result: {
-      ok: true,
-      claim: {
-        reference: c.reference,
-        creditor: c.creditor,
-        description: c.description,
-        original_due_date: c.originalDueDate,
-        amount_owed_nok: c.amountNok,
-        breakdown: { principal_nok: c.breakdown.principalNok, interest_and_fees_to_date_nok: c.breakdown.interestAndFeesNok },
-        interest_note: "Interest and fees are frozen while an agreed plan is kept.",
-      },
-      today,
-      latest_first_payment_date: addDays(today, MAX_DAYS_TO_FIRST_PAYMENT),
-      options: availableOptions(c.amountNok, today),
-    },
+    events: [{ type: "payment_options_sent" }, { type: "sms_sent", to: session.debtor.phone, purpose: "payment_options", body }],
+    result: { ok: true, message: "The payment options were sent by SMS. Tell them they can take their time and call back when ready." },
   };
 }
 
@@ -243,11 +260,30 @@ export function confirmAgreement(session: Session, args: ConfirmArgs, ctx: Conte
   };
 }
 
+const ESCALATION_SCRIPT: Partial<Record<EscalationReason, { say: string; sms: (s: Session) => string }>> = {
+  contact_preference: {
+    say: "Confirm you've recorded that they don't want calls from us. Be honest: you can't promise there will never be written contact about the claim; a colleague will review the request and reply once. Then close the call.",
+    sms: (s) => `${COLLECTOR_NAME}: we have recorded your request not to be called about ref ${s.claim.reference}. A colleague will review it. Questions: ${CONTACT_PHONE}.`,
+  },
+  crisis: {
+    say: "Stay calm and kind. Mention Mental Helse's helpline, 116 123. Tell them a person from the team will reach out, and do not talk about the claim.",
+    sms: () => `${COLLECTOR_NAME}: thank you for talking with us. A member of our team will be in touch. If you need someone to talk to now, Mental Helse's helpline is 116 123.`,
+  },
+  hardship: {
+    say: "Tell them a person will contact them within a week and nothing needs to be decided today. Mention NAV's free debt advice. Ask if there's a good time or way to reach them.",
+    sms: (s) => `${COLLECTOR_NAME}: thank you for talking with us about ref ${s.claim.reference}. Nothing needs to be decided now; a member of our team will contact you within 1 week. Free debt advice: NAV, 55 55 33 39.`,
+  },
+};
+
 export function escalate(session: Session, escalation: Escalation): ToolOutcome {
   const locked = LOCKING_REASONS.has(escalation.reason) || session.negotiationLocked;
-  const body = session.verified
-    ? `${COLLECTOR_NAME}: thank you for talking with us about ref ${session.claim.reference}. A member of our team will contact you within 1 week. Questions: ${CONTACT_PHONE}.`
-    : `${COLLECTOR_NAME} tried to reach you about a personal matter. Please call us on ${CONTACT_PHONE}.`; // no claim details before verification (N1)
+  const script = ESCALATION_SCRIPT[escalation.reason];
+  const body = !session.verified
+    ? `${COLLECTOR_NAME} tried to reach you about a personal matter. Please call us on ${CONTACT_PHONE}.` // nothing before verification (N1)
+    : script
+      ? script.sms(session)
+      : `${COLLECTOR_NAME}: thank you for talking with us about ref ${session.claim.reference}. A member of our team will contact you within 1 week. Questions: ${CONTACT_PHONE}.`;
+  const say = script?.say ?? "Tell them a person will follow up within a week and a short note was sent by SMS, then close the call kindly.";
   const state: SessionState = session.state === "agreed" || session.state === "locked_out" ? session.state : "escalated";
   return {
     session: { ...session, state, negotiationLocked: locked, approvedPlan: locked ? undefined : session.approvedPlan, escalations: [...session.escalations, escalation] },
@@ -255,7 +291,7 @@ export function escalate(session: Session, escalation: Escalation): ToolOutcome 
       { type: "escalated", escalation, locked },
       { type: "sms_sent", to: session.debtor.phone, purpose: "escalation_note", body },
     ],
-    result: { ok: true, message: "A person will follow up within 1 week, and a short note was sent by SMS. Tell the person that, then close the call kindly." + (locked ? " Do not discuss payment any further." : "") },
+    result: { ok: true, message: say + (locked ? " Do not discuss payment any further." : "") },
   };
 }
 

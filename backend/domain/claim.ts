@@ -28,7 +28,7 @@ export const demoDebtor: Debtor = {
 export const demoClaim: Claim = {
   id: "clm_001",
   reference: "NV-2026-10432",
-  creditor: "Lysverk Energi AS",
+  creditor: "Northlight Energy", // English-pronounceable for the English demo voice (A4)
   description: "Unpaid electricity invoice for August 2026",
   originalDueDate: "2026-09-15",
   amountNok: 3000,

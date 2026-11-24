@@ -7,6 +7,7 @@ import {
   newSession,
   proposePaymentPlan,
   recordContactPreference,
+  sendPaymentOptions,
   sendVerificationCode,
   verifyCode,
   type Context,
@@ -105,5 +106,26 @@ describe("escalation locks (N5, E1, E5)", () => {
     const out = recordContactPreference(verified(), "stop_contact");
     expect(out.session.negotiationLocked).toBe(true);
     expect(out.events.map((e) => e.type)).toContain("escalated");
+  });
+});
+
+describe("review fixes from call 01", () => {
+  it("returns the claim together with a successful verification (one round trip fewer)", () => {
+    const s = sendVerificationCode(newSession("ses_1", demoDebtor, demoClaim), ctx).session;
+    const out = verifyCode(s, CODE, ctx);
+    expect(out.result).toMatchObject({ ok: true, claim: { amount_owed_nok: 3000 } });
+    expect(out.events.map((e) => e.type)).toContain("claim_disclosed");
+  });
+
+  it("sends payment options in writing only after verification (principle 5, N1)", () => {
+    expect(sendPaymentOptions(newSession("ses_1", demoDebtor, demoClaim), ctx).result.ok).toBe(false);
+    const out = sendPaymentOptions(verified(), ctx);
+    expect(out.events).toContainEqual(expect.objectContaining({ type: "sms_sent", purpose: "payment_options" }));
+  });
+
+  it("does not promise follow-up contact to someone who asked for none", () => {
+    const out = recordContactPreference(verified(), "stop_contact");
+    const note = out.events.find((e) => e.type === "sms_sent");
+    expect(note && "body" in note && note.body).not.toMatch(/will contact you/);
   });
 });

@@ -9,6 +9,7 @@ import {
   getClaimDetails,
   proposePaymentPlan,
   recordContactPreference,
+  sendPaymentOptions,
   sendVerificationCode,
   verifyCode,
   type Context,
@@ -24,11 +25,15 @@ export const toolSchemas = {
     input: z.object({}),
   },
   verify_code: {
-    description: "Check the code the person reads out. Only the backend can mark the identity as verified.",
+    description: "Check the code the person reads out. Only the backend can mark the identity as verified. On success it also returns the claim details.",
     input: z.object({ code: z.string().describe("The digits the person read out") }),
   },
   get_claim_details: {
     description: "Get the claim, today's date, the latest allowed first payment date and the payment options. Fails until the identity is verified.",
+    input: z.object({}),
+  },
+  send_payment_options: {
+    description: "Send the payment options by SMS so the person can think it over. Use when they want time or ask for it in writing. Only after verification.",
     input: z.object({}),
   },
   propose_payment_plan: {
@@ -111,6 +116,8 @@ export function dispatchTool(session: Session, name: string, rawArgs: unknown, c
       return sendVerificationCode(session, ctx);
     case "get_claim_details":
       return getClaimDetails(session, ctx);
+    case "send_payment_options":
+      return sendPaymentOptions(session, ctx);
     case "verify_code": {
       const r = parse(toolSchemas.verify_code.input);
       return r.success ? verifyCode(session, r.data.code, ctx) : invalid(r.error.message);

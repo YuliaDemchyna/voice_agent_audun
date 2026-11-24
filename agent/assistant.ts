@@ -30,6 +30,8 @@ export function assistantConfig(opts: { serverUrl: string; model: string; secret
         { type: "endCall" },
       ],
     },
+    // Female voice (Yulia's design call: perceived as less threatening in this context).
+    voice: { provider: "11labs", voiceId: process.env.VAPI_VOICE_ID ?? "sarah" },
     server,
     serverMessages: ["tool-calls", "status-update", "end-of-call-report"],
     endCallMessage: "Thank you, goodbye.",

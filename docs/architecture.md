@@ -107,10 +107,12 @@
   model is a reasonable default and the evals decide whether a smaller one is
   enough. Prices per 1M input/output tokens: Sonnet 5.5 $2/$10, Haiku 5.5
   $0.10/$0.50, Opus 5.5 $4/$20 (Anthropic list prices, Nov 2026).
-- **Risk [unverified]:** whether Vapi's Anthropic provider lists Sonnet 5.5
-  yet. If it doesn't, we use the newest Claude model Vapi offers and record
-  the gap. That model mismatch between voice and text is one more reason to
-  consider custom-LLM mode (see D1).
+- **Known gap (confirmed 2026-11-24 by Yulia in the Vapi UI):** Vapi's model
+  picker does not offer Sonnet 5.5. The voice agent uses the newest Claude
+  model Vapi offers, and text mode keeps Sonnet 5.5. The text-mode model
+  should be switched to match whatever voice runs, so evals test the same
+  model. Deferred to Phase 3. That model mismatch between voice and text is
+  one more reason to consider custom-LLM mode (see D1).
 
 ### D4: Storage, `node:sqlite`
 

@@ -1,4 +1,9 @@
-import Vapi from "@vapi-ai/web";
+import VapiImport from "@vapi-ai/web";
+
+// @vapi-ai/web is CommonJS with `exports.default`; when bundled, the class can
+// end up one `.default` deeper than TypeScript expects.
+type VapiClient = InstanceType<typeof VapiImport>;
+const Vapi = ((VapiImport as unknown as { default?: typeof VapiImport }).default ?? VapiImport) as typeof VapiImport;
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const startBtn = $<HTMLButtonElement>("start");
@@ -7,7 +12,7 @@ const hangupBtn = $<HTMLButtonElement>("hangup");
 const statusEl = $("status");
 
 let sessionId: string | undefined;
-let vapi: Vapi | undefined;
+let vapi: VapiClient | undefined;
 let assistantId = "";
 let partial: HTMLElement | undefined;
 

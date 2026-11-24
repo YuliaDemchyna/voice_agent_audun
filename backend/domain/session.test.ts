@@ -128,6 +128,13 @@ describe("escalation locks (N5, E1, E5)", () => {
     expect(out.session.negotiationLocked).toBe(true);
   });
 
+  it("a written-only request before verification says nothing about a claim (N1)", () => {
+    const out = recordContactPreference(newSession("ses_1", demoDebtor, demoClaim), "written_only");
+    expect(String(out.result.message)).not.toMatch(/claim is still open|claim is wrong/i);
+    const sms = out.events.find((e) => e.type === "sms_sent");
+    expect(sms && "body" in sms ? sms.body : "").not.toContain(demoClaim.reference);
+  });
+
   it("stop-contact escalates and locks", () => {
     const out = recordContactPreference(verified(), "stop_contact");
     expect(out.session.negotiationLocked).toBe(true);

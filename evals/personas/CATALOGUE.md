@@ -117,34 +117,17 @@ behaviour.
 5. **Two journey rows conflict with the guided design** (rulebook C9): "Can't
 
    pay at all right now" and "Evasive… summarise the options at most once
-    more". They need rewriting.
+     more". They need rewriting.
 6. **Noise: done (2026-11-24).** The simulator now runs each persona 3
 
    times (`SIM_RUNS`) and reports the pass rate and pass^all, meaning every
-    run passed. The first baseline (`evals/results/13-baseline-3x`) passed
-    13/15 runs. The flaky checks were the stop-contact preference in
-    `reluctant_call01` and the `financial_difficulty` flag in `tight_budget`,
-    each 2/3. Both are fixed (runs 14–19): two rounds of 3 runs after the
-   fixes passed 30/30 (`18-flaky-fixes-v4-3x`, `19-confirm-3x`).
+     run passed. The first baseline (`evals/results/13-baseline-3x`) passed
+     13/15 runs. The flaky checks were the stop-contact preference in
+     `reluctant_call01` and the `financial_difficulty` flag in `tight_budget`,
+     each 2/3. Both are fixed (runs 14–19): two rounds of 3 runs after the
+    fixes passed 30/30 (`18-flaky-fixes-v4-3x`, `19-confirm-3x`).
 7. **Simulated debtors are too cooperative.** This is a known limitation and
 
    a non-goal ([product.md](../../docs/product.md#non-goals)): synthetic data
-    can only do so much. Persona scripts still say what the person will *not*
-    do ("never reads the code out").
-
-## Decisions (Yulia, 2026-11-24)
-
-The open questions, answered. These are not yet in the prompt; they go in
-together with the new personas once the evaluation criteria are confirmed
-([EVALUATION.md](../EVALUATION.md)).
-
-| # | Question | Decision |
-|---|---|---|
-| 1 | Scope | Build the P1 set first. Keep it to **3 runs per persona** to limit token spend. |
-| 2 | Ambiguous distress (D2) | A weak signal is not a strong one. **Check in once**, then suggest a plan. If they refuse the plan, escalate. |
-| 3 | Evasive (C6) | Offer the two-option choice for **at most 2–3 rounds**, depending on how the call goes. Then set a specific callback: "Is Friday at two good for me to call you?" |
-| 4 | Consequences (B5, C7) | **Use interest as the reason to agree a plan** (it keeps running without one and stops while a plan is kept). **Never threaten.** No other consequences are stated. |
-| 5 | Complaints (F3) | **Add a `complaint` reason code.** |
-| 6 | Language (F5) | Say plainly that this agent speaks English only and that a **Norwegian-speaking agent** will contact them. Building that path is out of scope, but it is designed. |
-| 7 | Stop-contact wording (F1) | Be honest that contact can't stop entirely while money is owed: "I understand. We'll follow up with a written message. If you think this claim is wrong, please reply in writing. Have a good day." |
-| 8 | Someone else paying (C9) | **No special answer.** Handle it as now: don't discuss the claim with anyone else, and don't make claims about who can pay. |
+     can only do so much. Persona scripts still say what the person will *not*
+     do ("never reads the code out").

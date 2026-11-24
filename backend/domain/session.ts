@@ -321,6 +321,10 @@ function flagFinancialDifficulty(session: Session, escalation: Escalation): Tool
   };
 }
 
+/** Before verification the stop-contact reply must not confirm that there is a claim (N1). */
+const PRE_VERIFICATION_PREFERENCE_SAY =
+  "Say: \"I understand, and I've noted it. We'll follow up in writing. Have a good day.\" Do not mention a claim, money or a debt. Then end the call.";
+
 export function escalate(session: Session, escalation: Escalation): ToolOutcome {
   if (escalation.reason === "financial_difficulty") return flagFinancialDifficulty(session, escalation);
   const locked = LOCKING_REASONS.has(escalation.reason) || session.negotiationLocked;
@@ -332,7 +336,10 @@ export function escalate(session: Session, escalation: Escalation): ToolOutcome 
     : script
       ? script.sms(session)
       : `${COLLECTOR_NAME}: thank you for talking with us about ref ${session.claim.reference}. A member of our team will contact you within 1 week. Questions: ${CONTACT_PHONE}.`;
-  const say = script?.say ?? "Tell them a person will follow up within a week and a short note was sent by SMS, then close the call kindly.";
+  const say =
+    !session.verified && escalation.reason === "contact_preference"
+      ? PRE_VERIFICATION_PREFERENCE_SAY
+      : (script?.say ?? "Tell them a person will follow up within a week and a short note was sent by SMS, then close the call kindly.");
   const state: SessionState = session.state === "agreed" || session.state === "locked_out" ? session.state : "escalated";
   return {
     session: { ...session, state, negotiationLocked: locked, approvedPlan: locked ? undefined : session.approvedPlan, escalations: [...session.escalations, escalation] },
@@ -358,11 +365,11 @@ export function escalateWithContactPreference(
   const out = escalate(session, escalation);
   if (preference === "none" || escalation.reason === "contact_preference") return out;
   const pref: Escalation = { reason: "contact_preference", summary: `Debtor asked for: ${preference}.`, debtorQuote: escalation.debtorQuote };
-  const script = ESCALATION_SCRIPT.contact_preference!;
+  const prefSay = session.verified ? ESCALATION_SCRIPT.contact_preference!.say : PRE_VERIFICATION_PREFERENCE_SAY;
   return {
     session: { ...out.session, negotiationLocked: true, approvedPlan: undefined, escalations: [...out.session.escalations, pref] },
     events: [...out.events, { type: "contact_preference_recorded", preference }, { type: "escalated", escalation: pref, locked: true }],
-    result: { ok: true, message: `${String(out.result.message)} They also asked for ${preference === "stop_contact" ? "no more contact" : "written contact only"}, which is now recorded. ${script.say}` },
+    result: { ok: true, message: `${String(out.result.message)} They also asked for ${preference === "stop_contact" ? "no more contact" : "written contact only"}, which is now recorded. ${prefSay}` },
   };
 }
 

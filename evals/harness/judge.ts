@@ -3,6 +3,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
+import { cost } from "./pricing.js";
 
 let client: Anthropic | undefined; // created lazily, after .env is loaded
 const JUDGE_MODEL = "claude-opus-5-5";
@@ -35,5 +36,5 @@ export async function judge(history: Array<{ role: string; text: string }>) {
     output_config: { format: { type: "json_schema", schema: z.toJSONSchema(Output) as Record<string, unknown> } },
   });
   const textBlock = res.content.find((b): b is Anthropic.TextBlock => b.type === "text");
-  return Output.parse(JSON.parse(textBlock?.text ?? "{}"));
+  return { ...Output.parse(JSON.parse(textBlock?.text ?? "{}")), cost: cost(JUDGE_MODEL, res.usage) };
 }

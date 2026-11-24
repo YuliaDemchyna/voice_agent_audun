@@ -1,7 +1,9 @@
 # Evaluation criteria (proposal for review)
 
-**Status:** proposal. Nothing here has been run yet; it waits for Yulia's
-confirmation. It defines what "the agent performs well" means and how each
+**Status:** confirmed by Yulia (2026-11-24) and implemented in
+`evals/harness/` (`metrics.ts`, `simulate.ts`). Tuning budget: at most 4
+committed prompt iterations after the baseline, re-running only the failing
+personas, and a full run at the end. Results: `evals/results/20-*` onward. It defines what "the agent performs well" means and how each
 part is measured, before the P1 personas from
 [personas/CATALOGUE.md](personas/CATALOGUE.md) are built.
 

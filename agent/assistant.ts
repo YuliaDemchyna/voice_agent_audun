@@ -26,6 +26,9 @@ export function assistantConfig(opts: { serverUrl: string; model: string; secret
           type: "function",
           function: { name: t.name, description: t.description, parameters: t.parameters },
           server,
+          // Empty request-start replaces Vapi's default filler ("This will just take a sec").
+          // Verified: https://docs.vapi.ai/tools/custom-tools
+          messages: [{ type: "request-start", content: "" }],
         })),
         { type: "endCall" },
       ],

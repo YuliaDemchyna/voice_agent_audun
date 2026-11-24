@@ -269,7 +269,7 @@ const ESCALATION_SCRIPT: Partial<Record<EscalationReason, { say: string; sms: (s
     sms: (s) => `${COLLECTOR_NAME}: we have recorded your request not to be called about ref ${s.claim.reference}. A colleague will review it. Questions: ${CONTACT_PHONE}.`,
   },
   recording_declined: {
-    say: "Say that's completely fine, a colleague will contact them another way, thank them, and end the call now. Do not mention the reason for the call.",
+    say: "Say exactly this, in full: \"Of course. I'm an AI assistant, so I can't handle this call without recording. A person from our team will be in touch with you instead.\" Do not mention the reason for the call and do not say goodbye yourself. Only after you have said it, end the call.",
     sms: () => `${COLLECTOR_NAME}: thank you for your time. A colleague will contact you without recording. You can also call us on ${CONTACT_PHONE}.`,
   },
   crisis: {

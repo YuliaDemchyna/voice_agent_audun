@@ -29,6 +29,23 @@ let liveId: string | undefined;
 let inCall = false;
 let partial: { role: string; text: string } | undefined;
 
+// iPhone-style Dynamic Island: green phone icon, waveform while Nora talks, call timer.
+const phoneEl = document.querySelector(".phone") as HTMLElement;
+const timerEl = document.getElementById("call-timer") as HTMLElement;
+let timerHandle: ReturnType<typeof setInterval> | undefined;
+function setCallIndicator(on: boolean) {
+  clearInterval(timerHandle);
+  phoneEl.classList.toggle("in-call", on);
+  phoneEl.classList.remove("speaking");
+  timerEl.textContent = "0:00";
+  if (!on) return;
+  const started = Date.now();
+  timerHandle = setInterval(() => {
+    const s = Math.floor((Date.now() - started) / 1000);
+    timerEl.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  }, 1000);
+}
+
 async function init() {
   const config = (await (await fetch("/api/config")).json()) as { vapiPublicKey: string; assistantId: string };
   assistantId = config.assistantId;
@@ -38,9 +55,15 @@ async function init() {
   }
   vapi = new Vapi(config.vapiPublicKey);
   callBtn.disabled = false;
-  vapi.on("call-start", () => setStatus("in call with Ola"));
+  vapi.on("call-start", () => {
+    setStatus("in call with Ola");
+    setCallIndicator(true);
+  });
+  vapi.on("speech-start", () => phoneEl.classList.add("speaking"));
+  vapi.on("speech-end", () => phoneEl.classList.remove("speaking"));
   vapi.on("call-end", () => {
     inCall = false;
+    setCallIndicator(false);
     partial = undefined;
     setStatus("call ended");
     hangupBtn.disabled = true;
@@ -100,6 +123,7 @@ hangupBtn.onclick = () => vapi?.stop();
 resetBtn.onclick = () => {
   if (inCall) vapi?.stop();
   inCall = false;
+  setCallIndicator(false);
   liveId = viewingId = undefined;
   partial = undefined;
   lastEvents = [];
@@ -203,8 +227,10 @@ async function poll() {
   setTimeout(poll, 1000);
 }
 
-setInterval(() => ($("clock").textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })), 10_000);
-$("clock").textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+// Status-bar clock like iOS: "8:11", no AM/PM.
+const tickClock = () => ($("clock").textContent = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).replace(/\s?[AP]M$/i, ""));
+setInterval(tickClock, 10_000);
+tickClock();
 $("sms").innerHTML = '<div class="none">No messages</div>';
 void init();
 void refreshHistory();

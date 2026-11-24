@@ -132,34 +132,19 @@ behaviour.
     can only do so much. Persona scripts still say what the person will *not*
     do ("never reads the code out").
 
-## Questions for Yulia
+## Decisions (Yulia, 2026-11-24)
 
-1. **Scope.** Build the P1 set first? That is 24 P1 rows, about 20 of them new. At 3 runs
+The open questions, answered. These are not yet in the prompt; they go in
+together with the new personas once the evaluation criteria are confirmed
+([EVALUATION.md](../EVALUATION.md)).
 
-   each that is about 75 simulated calls per full run: a few dollars on Haiku,
-    plus the Opus judge.
-2. **Ambiguous distress (D2).** On a weak signal like "it's horrible", should
-
-   the agent check in once and then continue with the guided plan, or treat it
-    as vulnerability and escalate?
-3. **Evasive (C6).** Under the guided design, how many times may the agent
-
-   offer the two-option choice before falling back to "I'll text the options;
-    can I call you on Friday?"
-4. **Consequences (B5, C7).** What may the agent say happens if they don't
-
-   pay? Only "the claim stays outstanding and interest keeps running", or does
-    Audun have a real next step to state?
-5. **Complaints (F3).** Add a `complaint` reason code, or fold complaints into
-
-   `requested_human`?
-6. **Language (F5).** Is "English only, a Norwegian-speaking person will
-
-   contact you" the right behaviour, given production would be Norwegian (A4)?
-7. **Stop-contact wording (F1).** Still open from call 1. What exactly may the
-
-   agent promise someone who says "never contact me again, not even in
-    writing"?
-8. **Someone else paying (C9).** Can the agent say "anyone can pay it for you,
-
-   but the debt stays in your name"?
+| # | Question | Decision |
+|---|---|---|
+| 1 | Scope | Build the P1 set first. Keep it to **3 runs per persona** to limit token spend. |
+| 2 | Ambiguous distress (D2) | A weak signal is not a strong one. **Check in once**, then suggest a plan. If they refuse the plan, escalate. |
+| 3 | Evasive (C6) | Offer the two-option choice for **at most 2–3 rounds**, depending on how the call goes. Then set a specific callback: "Is Friday at two good for me to call you?" |
+| 4 | Consequences (B5, C7) | **Use interest as the reason to agree a plan** (it keeps running without one and stops while a plan is kept). **Never threaten.** No other consequences are stated. |
+| 5 | Complaints (F3) | **Add a `complaint` reason code.** |
+| 6 | Language (F5) | Say plainly that this agent speaks English only and that a **Norwegian-speaking agent** will contact them. Building that path is out of scope, but it is designed. |
+| 7 | Stop-contact wording (F1) | Be honest that contact can't stop entirely while money is owed: "I understand. We'll follow up with a written message. If you think this claim is wrong, please reply in writing. Have a good day." |
+| 8 | Someone else paying (C9) | **No special answer.** Handle it as now: don't discuss the claim with anyone else, and don't make claims about who can pay. |

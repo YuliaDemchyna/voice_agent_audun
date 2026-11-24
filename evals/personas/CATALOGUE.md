@@ -114,11 +114,16 @@ behaviour.
 5. **Two journey rows conflict with the guided design** (rulebook C9): "Can't
    pay at all right now" and "Evasive… summarise the options at most once
    more". They need rewriting.
-6. **Noise.** One run per persona isn't enough: the same persona went 4/5,
-   then 5/5. Proposed: 3 runs per persona, reporting the pass rate.
-7. **Simulated debtors are too cooperative.** An LLM playing a debtor tends to
-   give in. Persona scripts should state what the person will *not* do
-   ("never reads the code out").
+6. **Noise: done (2026-11-24).** The simulator now runs each persona 3
+   times (`SIM_RUNS`) and reports the pass rate and pass^all, meaning every
+   run passed. The first baseline (`evals/results/13-baseline-3x`) passed
+   13/15 runs. The flaky checks were the stop-contact preference in
+   `reluctant_call01` and the `financial_difficulty` flag in `tight_budget`,
+   each 2/3.
+7. **Simulated debtors are too cooperative.** This is a known limitation and
+   a non-goal ([product.md](../../docs/product.md#non-goals)): synthetic data
+   can only do so much. Persona scripts still say what the person will *not*
+   do ("never reads the code out").
 
 ## Questions for Yulia
 

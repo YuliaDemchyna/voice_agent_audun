@@ -2,6 +2,7 @@
 // debtor, with no voice. Writes a transcript, hard checks and judge scores.
 //   npm run sim                       # all personas
 //   npm run sim -- cooperative hardship
+//   SIM_RUNS=5 npm run sim             # runs per persona (default 3); reports pass rates
 // Agent model defaults to the one Vapi runs (VAPI_MODEL), so text and voice match.
 
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -143,16 +144,63 @@ async function run(persona: Persona, label: string) {
 }
 
 const label = process.env.SIM_LABEL ?? "run";
+const RUNS = Math.max(1, Number(process.env.SIM_RUNS ?? 3));
+const CONCURRENCY = Math.max(1, Number(process.env.SIM_CONCURRENCY ?? 6));
 const selected = process.argv.slice(2);
 const toRun = selected.length ? personas.filter((p) => selected.includes(p.id)) : personas;
 const dir = `evals/results/${label}`;
 mkdirSync(dir, { recursive: true });
-const summary: string[] = [`# Simulation summary: ${label}`, "", `Agent model: ${AGENT_MODEL}`, "", "| Persona | Hard checks | Judge overall | Agent turns with digits |", "|---|---|---|---|"];
-const results = await Promise.all(toRun.map(async (p) => ({ p, r: await run(p, label) })));
-for (const { p, r } of results) {
-  writeFileSync(`${dir}/${p.id}.md`, r.md);
-  const passed = r.checks.filter(([, ok]) => ok).length;
-  summary.push(`| ${p.id} | ${passed}/${r.checks.length} | ${r.overall} | ${r.digits} |`);
+
+type Result = Awaited<ReturnType<typeof run>>;
+const jobs = toRun.flatMap((p) => Array.from({ length: RUNS }, (_, i) => ({ p, n: i + 1 })));
+const done: Array<{ p: Persona; n: number; r: Result }> = [];
+// Small worker pool so a full suite doesn't hit API rate limits.
+let next = 0;
+await Promise.all(
+  Array.from({ length: Math.min(CONCURRENCY, jobs.length) }, async () => {
+    while (next < jobs.length) {
+      const job = jobs[next++];
+      if (!job) break;
+      const r = await run(job.p, `${label}, run ${job.n}/${RUNS}`);
+      writeFileSync(`${dir}/${job.p.id}.run${job.n}.md`, r.md);
+      done.push({ ...job, r });
+      console.error(`done ${job.p.id} run ${job.n}`);
+    }
+  }),
+);
+
+const fmt = (x: number) => (Math.round(x * 10) / 10).toString();
+const summary: string[] = [
+  `# Simulation summary: ${label}`,
+  "",
+  `Agent model: ${AGENT_MODEL} · ${RUNS} runs per persona`,
+  "",
+  "**Pass rate** = share of runs where every hard check passed. **pass^all** = every run passed (the reliability bar: a rule that holds 2 times in 3 is not a guarantee).",
+  "",
+  "| Persona | Pass rate | pass^all | Judge mean (min–max) | Agent turns with digits |",
+  "|---|---|---|---|---|",
+];
+const failing: string[] = [];
+let totalRuns = 0;
+let totalPassed = 0;
+for (const p of toRun) {
+  const rs = done.filter((d) => d.p.id === p.id).map((d) => d.r);
+  const passedRuns = rs.filter((r) => r.checks.every(([, ok]) => ok)).length;
+  totalRuns += rs.length;
+  totalPassed += passedRuns;
+  const scores = rs.map((r) => Number(r.overall));
+  const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+  summary.push(
+    `| ${p.id} | ${passedRuns}/${rs.length} | ${passedRuns === rs.length ? "yes" : "**no**"} | ${fmt(mean)} (${fmt(Math.min(...scores))}–${fmt(Math.max(...scores))}) | ${rs.reduce((a, r) => a + r.digits, 0)} |`,
+  );
+  const names = [...new Set(rs.flatMap((r) => r.checks.map(([n]) => n)))];
+  for (const name of names) {
+    const ok = rs.filter((r) => r.checks.some(([n, pass]) => n === name && pass)).length;
+    if (ok < rs.length) failing.push(`| ${p.id} | ${name} | ${ok}/${rs.length} |`);
+  }
 }
+summary.push("", `**Overall:** ${totalPassed}/${totalRuns} runs passed every hard check.`, "");
+summary.push("## Hard checks below 100%", "");
+summary.push(...(failing.length ? ["| Persona | Check | Passed |", "|---|---|---|", ...failing] : ["None."]));
 writeFileSync(`${dir}/SUMMARY.md`, summary.join("\n") + "\n");
 console.log(summary.join("\n"));

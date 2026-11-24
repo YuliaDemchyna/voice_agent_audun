@@ -77,6 +77,14 @@ production, rather than build it. The agent design only assumes a transcript
 comes in and text goes out. The voicemail message itself (neutral, no debt
 details) is still specified in the journey.
 
+**A perfect eval dataset** is a non-goal too. The simulated debtors are
+synthetic: an LLM plays each persona, and LLM debtors tend to be too
+cooperative and give in more easily than real people. Persona scripts reduce
+this by stating what the person will *not* do ("never reads the code out"),
+but synthetic data can only do so much. The better the dataset, the better
+the agent can be developed, so in production the persona set would be
+rebuilt from real (anonymised) call transcripts and reviewer feedback.
+
 ## Success metrics
 
 | Metric | Type | Target (prototype) | How measured |

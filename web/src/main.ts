@@ -49,22 +49,38 @@ function setStatus(s: string) {
   statusEl.textContent = s;
 }
 
+// Vapi sends speech in fragments; merge consecutive fragments from the same
+// speaker into one bubble so the transcript reads like a conversation.
+const SPEAKER: Record<string, string> = { assistant: "Nora", user: "Ola" };
+let lastRole: string | undefined;
+let lastBubble: HTMLElement | undefined;
+
+function bubbleFor(role: string): HTMLElement {
+  if (lastRole === role && lastBubble) return lastBubble;
+  const div = document.createElement("div");
+  div.className = `turn ${role}`;
+  div.innerHTML = `<div class="who">${SPEAKER[role] ?? role}</div><div class="said"></div>`;
+  $("transcript").append(div);
+  lastRole = role;
+  lastBubble = div;
+  return div;
+}
+
 function showPartial(role: string, text: string) {
-  if (!partial) {
-    partial = document.createElement("div");
-    partial.className = "line partial";
-    $("transcript").append(partial);
-  }
-  partial.innerHTML = `<b>${role}</b>${escapeHtml(text)}`;
+  const said = bubbleFor(role).querySelector(".said") as HTMLElement;
+  partial?.remove();
+  partial = document.createElement("span");
+  partial.className = "partial";
+  partial.textContent = ` ${text}`;
+  said.append(partial);
+  $("transcript").scrollTop = 1e9;
 }
 
 function addLine(role: string, text: string) {
   partial?.remove();
   partial = undefined;
-  const div = document.createElement("div");
-  div.className = "line";
-  div.innerHTML = `<b>${role}</b>${escapeHtml(text)}`;
-  $("transcript").append(div);
+  const said = bubbleFor(role).querySelector(".said") as HTMLElement;
+  said.append(document.createTextNode(`${said.textContent ? " " : ""}${text}`));
   $("transcript").scrollTop = 1e9;
 }
 
@@ -76,6 +92,8 @@ startBtn.onclick = async () => {
   const s = (await (await fetch("/api/sessions", { method: "POST" })).json()) as { id: string };
   sessionId = s.id;
   $("transcript").innerHTML = "";
+  lastRole = undefined;
+  lastBubble = undefined;
   callBtn.disabled = !vapi;
   setStatus(`contact started: ${sessionId}`);
 };

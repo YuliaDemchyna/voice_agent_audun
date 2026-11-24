@@ -9,8 +9,13 @@ button:disabled { opacity: .4; cursor: default; }
 main { display: grid; grid-template-columns: 1.3fr 1fr 1.2fr; gap: 16px; padding: 0 20px 20px; }
 .panel { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 10px; max-height: 70vh; overflow: auto; }
 .small { font-size: 12px; max-height: 34vh; white-space: pre-wrap; }
-.line { margin: 6px 0; } .line b { display: inline-block; width: 62px; color: #555; }
-.line.partial { color: #999; }
+.turn { margin: 8px 0; max-width: 88%; }
+.turn .who { font-size: 11px; color: #777; margin-bottom: 2px; }
+.turn .said { padding: 8px 11px; border-radius: 12px; line-height: 1.4; font-size: 14px; }
+.turn.assistant .said { background: #f1efe8; }
+.turn.user { margin-left: auto; text-align: right; }
+.turn.user .said { background: #e8f0fe; text-align: left; }
+.partial { color: #999; }
 .phone .msg { background: #e8f0fe; border-radius: 10px; padding: 8px 10px; margin: 6px 0; white-space: pre-wrap; font-size: 13px; }
 .ev { border-bottom: 1px solid #eee; padding: 3px 0; } .ev code { color: #0a5; }
 .ev.bad code { color: #c33; }

@@ -1,0 +1,34 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+
+# Local data
+*.sqlite
+*.sqlite3
+*.db
+data/
+
+# Eval scratch output (committed results live in evals/results/)
+evals/.cache/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

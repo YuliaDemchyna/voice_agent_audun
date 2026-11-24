@@ -44,19 +44,22 @@ error unless the session is `Verified` or later.
 
 ## 1. Contact
 
-**Happy path:** the agent greets the person, says it is an AI assistant calling
-on behalf of [creditor] about "a personal matter", and asks to speak with the
-named debtor. It does not mention debt, amount or creditor type.
-The agent names only the calling company, not the creditor (N1). The agent also says it is an AI and that the call is recorded (C1). Whether to name even the company is an open point in the rulebook.
+**Happy path:** the call happens within the permitted hours and attempt
+limits (N9). The agent names the calling company, says it is an AI assistant
+and that the call is recorded and why (C1), and asks to speak with the named
+debtor about "a personal matter". It does not mention the debt, the amount or
+the creditor (N1). Whether to name even the company is an open point in the
+rulebook.
 
 | Edge case | Agent response | Outcome | Enforced by | Prototype |
 |---|---|---|---|---|
-| Wrong person answers ("he's not home", "wrong number") | Apologise, disclose nothing, ask if there is a better time to reach the person, end politely. | Follow-up (retry later). Wrong-number flag on the contact. | prompt, plus code: no claim data is available before verification | ✅ (eval persona) |
-| Voicemail | Leave a neutral message: name, "a personal matter", a callback number. No debt details. | Follow-up (retry) | prompt | 📐 needs telephony |
+| Wrong person answers ("he's not home", "wrong number") | Apologise, disclose nothing, ask if there is a better time to reach the person, end politely. | Follow-up (retry within N9 limits). On "wrong number", flag the number so it isn't used again until it is confirmed to belong to the debtor (circular 5/2022 § 2). | prompt, plus code: no claim data is available before verification | ✅ (eval persona) |
+| Voicemail | Leave a neutral message: name, "a personal matter", a callback number. No debt details (our inference from N1; no source covers voicemail directly). | Follow-up (retry) | prompt | 📐 needs telephony |
 | Debtor is suspicious ("is this a scam?") | Acknowledge; explain how to verify independently (call the creditor's public number); explain the code is sent to their own phone. Never ask for bank details. | Auto | prompt | ✅ |
 | Asks "is this an AI?" | Always truthful: yes. | Auto | prompt (also stated in the opening) | ✅ |
-| Inconvenient time ("I'm driving", "call later") | Offer a callback and end the call. | Follow-up (scheduled callback) | prompt | 🟡 callback request logged, not scheduled |
-| Wants all contact to stop, or written contact only | Confirm, record the preference, end the call. | Human (flag on account) plus written confirmation | code: `record_contact_preference` | ✅ |
+| Inconvenient time ("I'm driving", "call later") | Offer a callback at a time they choose, within permitted hours (N9), and end the call. | Follow-up (scheduled callback) | prompt | 🟡 callback request logged, not scheduled |
+| Declines recording | Accept. Offer to continue in writing instead, and end the call (C1). | Follow-up (written channel) | code: `record_contact_preference(written_only)` | ✅ |
+| Wants all contact to stop, or written contact only | Confirm, record the preference, end the call. The number goes on the opt-out register, so no automated calls (E5). | Human (flag on account) plus written confirmation | code: `record_contact_preference` | ✅ |
 
 ## 2. Identity
 
@@ -84,7 +87,7 @@ only the claim record returned by the tool. Nothing is invented.
 | Edge case | Agent response | Outcome | Enforced by | Prototype |
 |---|---|---|---|---|
 | Question the claim record doesn't answer | Say it doesn't have that information. Offer to note the question for a human or include it in the written follow-up. | Follow-up or Human | prompt | ✅ |
-| **Dispute** ("I already paid", "this isn't mine", "the amount is wrong") | Acknowledge, don't argue, don't push for payment. Record the reason. Say a person will review it and that collection pauses while it is reviewed and they will get a written answer (E1, new act §§ 24–25). | **Human** | code: `escalate(reason="dispute")`; negotiation tools disabled after a dispute | ✅ |
+| **Dispute** ("I already paid", "this isn't mine", "the amount is wrong") | Acknowledge, don't argue, don't push for payment. Record the reason. Say a person will review it and that collection pauses while it is reviewed and they will get a written, reasoned answer (E1, new act §§ 24–25). Any inquiry gets a reply within 1 week (§ 17). | **Human** | code: `escalate(reason="dispute")`; negotiation tools disabled after a dispute | ✅ |
 | Confused about who the creditor is | Explain the original creditor and the relationship. | Auto | prompt | ✅ |
 
 ## 4. Negotiation
@@ -96,11 +99,15 @@ with the first payment within 14 days. The model calls
 
 | Edge case | Agent response | Outcome | Enforced by | Prototype |
 |---|---|---|---|---|
-| Asks for a discount | Explain that discounts aren't available. Present the instalment option. If they still want one, offer human review. | Auto, or Human if insisted | **code**: the policy engine rejects any total below the claim | ✅ (eval persona) |
+| Asks for a discount | Explain that discounts aren't available and why, then present the instalment option (C8). If they still want one, offer human review. | Auto, or Human if insisted | **code**: the policy engine rejects any total below the claim | ✅ (eval persona) |
 | Asks for more instalments (e.g. 6) or a later first payment | Explain the options that are available. Offer human review for anything else. | Human if they want it | **code** | ✅ |
 | Can't pay at all right now | No pressure. Ask if they want a person to look at options. Signpost free debt advice (NAV *gjeldsrådgivning*, C6). | Human | prompt | ✅ |
-| **Hardship or distress** (job loss, illness, bereavement, crying, "I can't cope") | Slow down, acknowledge, stop negotiating. Offer to pause and have a person follow up. Signpost help. | **Human** (priority) | prompt (detection), code (`escalate(reason="hardship")` disables negotiation tools) | ✅ (eval persona) |
-| Evasive or non-committal ("maybe", "I'll think about it") | Summarise the options once. Offer to send them in writing. Don't push repeatedly. | Follow-up (options sent) | prompt | ✅ (eval persona) |
+| **Hardship or distress** (job loss, illness, bereavement, crying, "I can't cope") | Slow down and acknowledge it. Stop negotiating and never push full payment or suggest borrowing (N4). Offer to pause, have a person follow up, and signpost NAV debt advice (C6, E2). | **Human** (priority) | prompt (detection), code (`escalate(reason="hardship")` disables negotiation tools) | ✅ (eval persona) |
+| Evasive or non-committal ("maybe", "I'll think about it") | Summarise the options at most once more. Offer to send them in writing. Don't ask again after a clear "no" or "not now" (N4). | Follow-up (options sent) | prompt | ✅ (eval persona) |
+| **Crisis** (mentions self-harm or suicide, acute panic) | Stop all talk of the claim. Respond calmly. Give crisis-line information (Norway: Mental Helse's helpline 116 123, *number unverified*). Hand over to a human immediately. | **Human** (P0) | prompt (detection); code: `escalate("crisis")` locks the session | ✅ (eval persona) |
+| Confused, repeats questions, can't follow the options (possible lack of capacity) | Use simpler language and check understanding. If they still can't decide, don't take an agreement; pause and escalate. | **Human** | prompt (detection); code: `escalate("hardship")` disables `confirm_agreement` | ✅ (eval persona) |
+| Working with a debt adviser or NAV | Note the adviser. Pause collection for about 30 days (E9). | Human (pause set) | code: `escalate("debt_adviser")` | 🟡 pause recorded, no timer |
+| Someone in the background seems to be coaching or pressuring the debtor | Don't engage the third party. Ask the debtor directly whether now is a good time. If unsure, pause and escalate. | Follow-up or Human | prompt | 📐 hard to detect in a demo |
 | Asks for a human | Accept immediately. Don't try to retain them. | **Human** | code: `escalate(reason="requested_human")` | ✅ |
 | Abusive or threatening | Set a boundary once. End the call if it continues. | Human (flag) | prompt | 🟡 |
 
@@ -116,17 +123,19 @@ session and its terms match.
 |---|---|---|---|---|
 | Ambiguous reply ("I guess", "mm") | Ask again for a clear yes or no. | Auto | prompt; **code**: `confirm_agreement` needs a prior approved proposal with matching terms | ✅ |
 | Changes mind at read-back | Go back to negotiation. Nothing is recorded. | Auto | code (proposal is superseded) | ✅ |
+| Distress or confusion shows up at the read-back | Don't record the agreement; follow the crisis or capacity row above. | Human | prompt; code (escalation disables `confirm_agreement`) | ✅ |
 | Model tries to confirm a plan that was never approved | The tool rejects it. | Auto | **code** | ✅ (hard check) |
 
 ## 6. Follow-up
 
-**Happy path:** after an agreement the backend sends a written summary (mocked
-SMS or email in the UI): the plan, the dates, how to pay, how to contact a
-human, and how to dispute.
+**Happy path:** after an agreement the backend sends a written confirmation
+(mocked SMS or email in the UI). It covers each due date and amount (C5, new
+act § 16(4)), how to pay, how to dispute, how to reach the collector about
+payment difficulties (§ 20(3)), and NAV debt advice.
 
 | Edge case | Agent response | Outcome | Enforced by | Prototype |
 |---|---|---|---|---|
 | Call drops mid-negotiation | Session state is kept. A follow-up asks them to call back or reply, and nothing is agreed. | Follow-up | code (no agreement without `confirm_agreement`) | 🟡 message sent; resume not built |
 | Call drops after the agreement | The agreement stands and the follow-up is sent as normal. | Auto | code | ✅ |
-| Escalated call | A note says a person will be in touch. The ticket goes to the reviewer queue. | Human | code | ✅ |
+| Escalated call | A note says a person will be in touch. The ticket goes to the reviewer queue, and the debtor gets a reply within 1 week (new act § 17). A dispute gets a written, reasoned answer (§ 25). | Human | code | ✅ |
 | Payment missed later | Reminder, then a new contact attempt. | Follow-up | n/a | 📐 out of scope |

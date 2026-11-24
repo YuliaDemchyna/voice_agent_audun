@@ -8,20 +8,28 @@ model-written. Everything else is facts the backend recorded.
 
 ## When a ticket is created
 
-| Reason code | Trigger | Priority |
-|---|---|---|
-| `hardship` | Agent detects vulnerability or distress (illness, job loss, bereavement, "can't cope") | **P1**, reviewer contact within 1 business day *(assumed SLA)* |
-| `dispute` | Debtor says the claim is wrong, paid, or not theirs | P2 |
-| `out_of_policy` | Debtor wants terms the policy engine rejected (discount, more instalments, later start) and asks for review | P3 |
-| `requested_human` | Debtor asks for a person | P2 |
-| `contact_preference` | Debtor asks to stop contact or to be contacted only in writing | P2 (compliance) |
-| `verification_failed` | Lockout after too many wrong codes, or a third party claims authority | P3 |
-| `agent_error` | A tool error or an unexpected state the agent couldn't recover from | P2 |
+| Reason code | Trigger | Priority | Reviewer acts within |
+|---|---|---|---|
+| `crisis` | Self-harm or suicide mentioned, or acute panic | **P0** | Immediately *(target)* |
+| `hardship` | Vulnerability or distress (illness, job loss, bereavement, "can't cope"), or possible lack of capacity (confusion, can't follow the options) | **P1** | 1 business day *(target)* |
+| `dispute` | Debtor says the claim is wrong, paid, or not theirs | P2 | Written, reasoned answer (new act § 25) |
+| `requested_human` | Debtor asks for a person | P2 | 1 week |
+| `contact_preference` | Debtor asks to stop contact or to be contacted only in writing | P2 (compliance) | Applied at once by code; human review within 1 week |
+| `agent_error` | A tool error or an unexpected state the agent couldn't recover from | P2 | 1 week |
+| `debt_adviser` | Debtor is working with a debt adviser or NAV | P3 | Pause collection for about 30 days *(UK benchmark, FCA CONC 7.3.11)* |
+| `out_of_policy` | Debtor wants terms the policy engine rejected (discount, more instalments, later start) and asks for review | P3 | 1 week |
+| `verification_failed` | Lockout after too many wrong codes, or a third party claims authority | P3 | 1 week |
 
-Once a call escalates for `dispute`, `hardship` or `contact_preference`, the
-backend disables the negotiation tools for the rest of that session. The agent
-cannot keep pushing for payment after a person has asked it to stop or has
-disputed the claim.
+**Deadlines.** The legal floor is a reply to any debtor inquiry within
+1 week, or an interim reply plus a decision on pausing collection (new act
+§ 17). Anything marked *target* is our own internal goal, not a legal
+requirement (see [assumptions.md](assumptions.md)).
+
+Once a call escalates for `crisis`, `hardship`, `dispute`,
+`contact_preference` or `debt_adviser`, the backend disables the negotiation
+and confirmation tools for the rest of that session. The agent cannot keep
+pushing for payment, or take an agreement, after a person has disputed the
+claim, asked it to stop, or shown they may not be able to decide.
 
 ## Ticket contents
 

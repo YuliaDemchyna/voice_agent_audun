@@ -111,7 +111,11 @@
   picker does not offer Sonnet 5.5. The voice agent uses the newest Claude
   model Vapi offers, and text mode keeps Sonnet 5.5. The text-mode model
   should be switched to match whatever voice runs, so evals test the same
-  model. Deferred to Phase 3. That model mismatch between voice and text is
+  model. Deferred to Phase 3. Per [research/vapi.md](research/vapi.md),
+  Vapi lists Claude Haiku 5.5 and Sonnet 5 but not Sonnet 5.5, so the
+  Phase 3 options are: (a) Haiku 5.5 in both modes, so there is no mismatch
+  and evals already compare it; (b) Sonnet 5 in both; (c) custom-LLM mode
+  with Sonnet 5.5. That model mismatch between voice and text is
   one more reason to consider custom-LLM mode (see D1).
 
 ### D4: Storage, `node:sqlite`

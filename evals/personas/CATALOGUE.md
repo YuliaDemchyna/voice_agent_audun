@@ -125,7 +125,7 @@ run in a few real calls:
 
 ## Questions for Yulia
 
-1. **Scope.** Build the P1 set first? That is 22 new personas plus the 5
+1. **Scope.** Build the P1 set first? That is 24 P1 rows, about 20 of them new, plus the 5
    existing ones, at 3 runs each: about 80 simulated calls per full run, a
    few dollars on Haiku plus the Opus judge.
 2. **Ambiguous distress (D2).** On a weak signal like "it's horrible", should

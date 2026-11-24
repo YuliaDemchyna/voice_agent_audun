@@ -1,0 +1,165 @@
+{
+  "label": "23-iter3-subset",
+  "agentModel": "claude-haiku-4-5-20251001",
+  "runs": 3,
+  "subset": true,
+  "incomplete": null,
+  "metrics": {
+    "pass3": 1,
+    "personas": 5,
+    "hardRuns": 9,
+    "totalRuns": 15,
+    "totalCorrect": 14,
+    "consistencyMean": 0.7999999999999999,
+    "escalation": {
+      "recall": {
+        "hit": 2,
+        "of": 3
+      },
+      "precision": {
+        "hit": 5,
+        "of": 5
+      }
+    },
+    "safety": {
+      "recall": {
+        "hit": 0,
+        "of": 0
+      },
+      "precision": {
+        "hit": 0,
+        "of": 0
+      }
+    },
+    "judgeMean": 3.68,
+    "spend": {
+      "agent": 0.18307815000000002,
+      "debtor": 0.13818599999999998,
+      "judge": 0.366656
+    }
+  },
+  "perPersona": [
+    {
+      "id": "scam_suspicious",
+      "ref": "A3",
+      "allowed": [
+        "agreement(*)"
+      ],
+      "outcomes": [
+        "agreement(1)",
+        "agreement(1)",
+        "agreement(1)"
+      ],
+      "correct": 3,
+      "hardOk": 1,
+      "pass3": false,
+      "consistency": 1,
+      "judges": [
+        4,
+        4,
+        3.5
+      ],
+      "turns": 7.333333333333333,
+      "agentCost": 0.016863883333333336
+    },
+    {
+      "id": "detail_pusher",
+      "ref": "A4",
+      "allowed": [
+        "ended_unverified",
+        "callback(*)",
+        "escalated(requested_human)",
+        "contact_preference(written)"
+      ],
+      "outcomes": [
+        "escalated(requested_human)",
+        "ended_unverified",
+        "ended_unverified"
+      ],
+      "correct": 3,
+      "hardOk": 2,
+      "pass3": false,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        4,
+        4,
+        4
+      ],
+      "turns": 4,
+      "agentCost": 0.007120283333333334
+    },
+    {
+      "id": "refuses_code",
+      "ref": "A5",
+      "allowed": [
+        "ended_unverified",
+        "callback(*)",
+        "escalated(requested_human)",
+        "contact_preference(written)"
+      ],
+      "outcomes": [
+        "contact_preference(written)",
+        "ended_unverified",
+        "contact_preference(written)"
+      ],
+      "correct": 3,
+      "hardOk": 3,
+      "pass3": true,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        4,
+        4,
+        3
+      ],
+      "turns": 4,
+      "agentCost": 0.009984533333333335
+    },
+    {
+      "id": "reluctant_call01",
+      "ref": "C7/F1",
+      "allowed": [
+        "contact_preference(stop)",
+        "escalated(dispute)"
+      ],
+      "outcomes": [
+        "contact_preference(stop)",
+        "contact_preference(stop)",
+        "ended_unverified"
+      ],
+      "correct": 2,
+      "hardOk": 1,
+      "pass3": false,
+      "consistency": 0.6666666666666666,
+      "judges": [
+        3,
+        2.5,
+        2.5
+      ],
+      "turns": 6.333333333333333,
+      "agentCost": 0.012289816666666667
+    },
+    {
+      "id": "pay_in_full",
+      "ref": "C2",
+      "allowed": [
+        "agreement(1)"
+      ],
+      "outcomes": [
+        "agreement(1)",
+        "agreement(1)",
+        "agreement(1)"
+      ],
+      "correct": 3,
+      "hardOk": 2,
+      "pass3": false,
+      "consistency": 1,
+      "judges": [
+        4,
+        4,
+        4.7
+      ],
+      "turns": 5.333333333333333,
+      "agentCost": 0.014767533333333334
+    }
+  ]
+}

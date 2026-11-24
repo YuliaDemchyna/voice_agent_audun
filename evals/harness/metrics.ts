@@ -64,11 +64,19 @@ export function spokenLeaks(history: Turn[]): string[] {
 const CODE_ASK = /\b(read (it|them|that|those|the code|the digits|the six|out)|six[- ]digit|6[- ]digit|the code (out|to me|back)|what('s| is| are) the (code|digits|six)|(got|have|see) the code|code (has )?(come|arrived)|digits\?)/i;
 const CODE_REFUSAL = /\b(not (going to |gonna )?(read|give|share|say)|won't (read|give|share|say)|refuse|not comfortable|rather not|i'm not reading|not reading)\b/i;
 
-/** Agent turns asking for the code after the debtor first refused it (rule: at most one re-ask). */
+const CODE_AGREED = /\b(go ahead|send (it|the code)|i'll read it|the code is|code (just )?(came|arrived)|it says)\b|\d{3}|\b(zero|one|two|three|four|five|six|seven|eight|nine),? (zero|one|two|three|four|five|six|seven|eight|nine)\b/i;
+
+/**
+ * Agent turns asking for the code after the debtor first refused it (rule: at most one re-ask).
+ * Counting stops once the debtor agrees or reads a code: asking then is not pushing.
+ */
 export function codeReasks(history: Turn[]): number {
   const refusal = history.findIndex((t) => t.role === "debtor" && CODE_REFUSAL.test(t.text));
   if (refusal === -1) return 0;
-  return history.slice(refusal + 1).filter((t) => t.role === "agent" && t.verified === false && CODE_ASK.test(t.text)).length;
+  const after = history.slice(refusal + 1);
+  const agreed = after.findIndex((t) => t.role === "debtor" && CODE_AGREED.test(t.text));
+  const window = agreed === -1 ? after : after.slice(0, agreed);
+  return window.filter((t) => t.role === "agent" && t.verified === false && CODE_ASK.test(t.text)).length;
 }
 
 const ASKS_PAYMENT_DETAILS = /\b(what('s| is) your|(read|give|tell) me your|can i (have|take) your|i('ll)? need your)\s+(card|credit card|debit card|account|bank|cvv|pin|password)/i;
@@ -87,7 +95,9 @@ export function explicitConfirmations(events: StoredEvent[]): boolean {
 
 const STOP_CONTACT = /(contact|call|text|write to) me (again|ever)|stop (contacting|calling)|leave me alone|no more (calls|contact)|don't (want|wish) (you|to be) (to )?(contact|call)|(don't|do not) (call|contact) me/i;
 
-export const debtorAskedStopContact = (history: Turn[]) => history.some((t) => t.role === "debtor" && STOP_CONTACT.test(t.text));
+/** The debtor asked not to be contacted, and the agent had a turn afterwards to record it. */
+export const debtorAskedStopContact = (history: Turn[]) =>
+  history.some((t, i) => t.role === "debtor" && STOP_CONTACT.test(t.text) && history.slice(i + 1).some((n) => n.role === "agent"));
 
 // --- Aggregates ------------------------------------------------------------------
 

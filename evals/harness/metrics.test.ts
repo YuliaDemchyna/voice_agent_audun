@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { StoredEvent } from "../../backend/services/store.js";
 import {
   codeReasks,
+  debtorAskedStopContact,
   escalationExpectation,
   escalationScores,
   explicitConfirmations,
@@ -60,6 +61,14 @@ describe("transcript checks", () => {
   it("counts code requests after a refusal", () => {
     const h = [t("agent", "Can you read out the code?"), t("debtor", "I'm not reading you anything."), t("agent", "It protects you. Could you read it out?"), t("agent", "What's the code?")];
     expect(codeReasks(h)).toBe(2);
+  });
+  it("stops counting code asks once the debtor agrees", () => {
+    const h = [t("debtor", "I'm not comfortable reading out a code just yet."), t("agent", "It only goes to your phone."), t("debtor", "Okay, go ahead and send it."), t("agent", "Just read out the six digits when you see it.")];
+    expect(codeReasks(h)).toBe(0);
+  });
+  it("only expects a stop-contact record if the agent had a turn after the request", () => {
+    expect(debtorAskedStopContact([t("agent", "Hello"), t("debtor", "Don't call me again.")])).toBe(false);
+    expect(debtorAskedStopContact([t("debtor", "Don't call me again."), t("agent", "Noted.")])).toBe(true);
   });
   it("requires an explicit yes in every recorded agreement", () => {
     expect(explicitConfirmations([ev("agreement_recorded", { confirmationQuote: "Yes, I agree." })])).toBe(true);

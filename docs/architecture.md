@@ -27,10 +27,10 @@
 |---|---|---|---|
 | D0 | 2026-11-24 | Repo layout: `domain` / `conversation` / `transport` split inside `backend/` (see README) | Accepted |
 | D1 | 2026-11-24 | Voice platform: **Vapi**, default mode (Vapi runs the LLM, our tools via server webhook) | Accepted |
-| D2 | 2026-11-24 | LLM(s) for agent, debtor simulator, judge | Pending |
+| D2 | 2026-11-24 | LLMs: agent **Claude Sonnet 5.5**, debtor simulator **Sonnet 5.5**, judge **Opus 5.5**; Haiku 5.5 as an eval comparison | Accepted |
 | D3 | 2026-11-24 | Backend: **TypeScript + Hono**, one language across backend, web and evals | Accepted |
-| D4 | 2026-11-24 | Storage (session state, event log) | Pending |
-| D5 | 2026-11-24 | Eval tooling | Pending |
+| D4 | 2026-11-24 | Storage: **`node:sqlite`**, append-only `events` table | Accepted |
+| D5 | 2026-11-24 | Evals: **thin custom harness on Vitest** | Accepted |
 
 ### D0: Repo layout
 
@@ -91,3 +91,52 @@
 - **Tradeoff:** the self-hosted migration target in scaling.md (Pipecat) is
   Python. LiveKit Agents has a Node SDK **[verify maturity before relying on
   it]**, so it is the more natural TS-side option.
+
+### D2: LLMs
+
+- **Options considered:** for the agent, Sonnet 5.5, Haiku 5.5 or Opus 5.5.
+  For the simulator and the judge, Sonnet 5.5 and Opus 5.5.
+- **Decision:** the agent runs on `claude-sonnet-5-5`, selected in the Vapi
+  assistant config for voice and called directly in text mode. The debtor
+  simulator also runs on `claude-sonnet-5-5`. The judge runs on
+  `claude-opus-5-5`, a stronger model than the agent with a separate rubric
+  prompt. The evals also run the agent on `claude-haiku-5-5` for a cost and
+  quality comparison.
+- **Why:** voice needs a low time-to-first-token. Because the hard rules live
+  in code, the agent model only carries the soft behaviour, so a mid-tier
+  model is a reasonable default and the evals decide whether a smaller one is
+  enough. Prices per 1M input/output tokens: Sonnet 5.5 $2/$10, Haiku 5.5
+  $0.10/$0.50, Opus 5.5 $4/$20 (Anthropic list prices, Nov 2026).
+- **Risk [unverified]:** whether Vapi's Anthropic provider lists Sonnet 5.5
+  yet. If it doesn't, we use the newest Claude model Vapi offers and record
+  the gap. That model mismatch between voice and text is one more reason to
+  consider custom-LLM mode (see D1).
+
+### D4: Storage, `node:sqlite`
+
+- **Options considered:** `node:sqlite`, `better-sqlite3`, in-memory,
+  Postgres.
+- **Decision:** `node:sqlite`, built into Node 22. The data is one
+  append-only `events` table (session id, sequence number, type, JSON
+  payload, timestamp) plus small tables for session state, the OTP and
+  agreements.
+- **Why:** no native build step and no Docker, so a reviewer can run it
+  quickly. Data survives between runs and can be inspected. The hard checks
+  in the evals are plain queries over `events`.
+- **Tradeoff:** the module is still marked experimental in Node 22 and prints
+  a warning. The event-log shape maps directly onto an append-only stream
+  (Postgres or Kafka) at scale; see scaling.md.
+
+### D5: Evals, thin harness on Vitest
+
+- **Options considered:** a custom harness on Vitest, promptfoo, Braintrust,
+  Inspect.
+- **Decision:** each persona is a Vitest test. The test runs a simulated
+  conversation in text mode, then asserts the hard checks against the event
+  log (pass/fail, no LLM involved). It then calls the judge for rubric
+  scores, which are written to `evals/results/` and never gate a pass.
+- **Why:** there are no framework concepts to explain, and the hard checks
+  are ordinary assertions. Multi-turn conversations with a simulated debtor
+  fit poorly into promptfoo's single-prompt model.
+- **Tradeoff:** no hosted dashboard or experiment tracking. Results are
+  committed JSON and Markdown.

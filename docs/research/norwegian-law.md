@@ -57,4 +57,10 @@
 
 **12. New act status.** Lovdata marks LOV-2026-05-22-19 as not in force, with commencement set by the King (§ 55): https://lovdata.no/dokument/NL/lov/2026-05-22-19 (**VERIFIED**). The 1 Jan 2027 target comes from Finans Norge: https://www.finansnorge.no/contentassets/416d893bcb3b440f80f937fd8e8d8d45/hva-betyr-ny-inkassolov.pdf (**UNVERIFIED**, not opened).
 
+**13. Late-payment interest during an instalment plan (forsinkelsesrenteloven, LOV-1976-12-17-100).** *Added 24 Nov 2026 during review.*
+- Interest runs from the due date when a claim isn't paid on time (§ 2). The act gives no end date other than payment, and says nothing about interest pausing during an instalment plan or deferral. **VERIFIED.**
+- The act is default law: it applies "insofar as nothing else follows from agreement" (§ 1). In consumer cases, §§ 2–4 cannot be changed by agreement to the **debtor's** detriment (§ 4 c). So a creditor may agree to freeze or waive interest in the debtor's favour, but can't agree a higher rate. **VERIFIED** (text); applying it to a frozen-interest plan is our **inference**.
+- Rate: Norges Bank's policy rate plus at least 8 percentage points, set every half-year (§ 3). **12.25 % a year from 1 July 2026.** It is simple interest; the act provides no interest on interest (our **inference**: the text doesn't mention compounding). *Sources:* https://lovdata.no/dokument/NL/lov/1976-12-17-100 §§ 1–4 and https://www.finanstilsynet.no/nyhetsarkiv/nyheter/2026/forsinkelsesrente-og-standardkompensasjon-for-inndrivelseskostnader-fra-1.-juli-2026 (**VERIFIED**). Finanstilsynet now sets the rate under a 2025 delegation from the ministry.
+- Practice: consumer-guidance sites say interest keeps running under a payment agreement unless the creditor explicitly agrees to freeze it (e.g. https://www.penger.org/gjeld-og-inkasso/forsinkelsesrente/). **UNVERIFIED** (secondary sources).
+
 **Not found:** any Finanstilsynet or Datatilsynet guidance specifically on AI voice agents in debt collection, or any rule prescribing the identity-verification method.

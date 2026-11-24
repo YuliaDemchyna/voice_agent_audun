@@ -7,6 +7,7 @@ import type { StoredEvent } from "./store.js";
 const PRIORITY: Record<string, string> = {
   crisis: "P0",
   hardship: "P1",
+  financial_difficulty: "P3",
   dispute: "P2",
   requested_human: "P2",
   contact_preference: "P2",

@@ -44,7 +44,7 @@ Each principle links to its evidence in the [appendix](#appendix-evidence-for-th
 2. **Guarantees over flexibility.** Anything that must never happen is blocked in code, not just asked for in the prompt. Out-of-policy requests go to a human, not to the model's judgement. [Evidence](#2-guarantees-over-flexibility)
 3. **When in doubt, escalate.** A human over automation rate. A needless escalation costs a reviewer a few minutes; a missed one harms the debtor and breaches the law. [Evidence](#3-when-in-doubt-escalate)
 4. **Debtor experience over short-term conversion.** No pressure, even when it would close more plans on this call. [Evidence](#4-debtor-experience-over-short-term-conversion)
-5. **Collaboration over closing.** Understand the debtor's situation before proposing terms, and offer the options neutrally. "Not now" is acceptable: we send the options in writing and call back at their chosen time. [Evidence](#5-collaboration-over-closing)
+5. **Guide to a plan, don't interrogate.** The goal of the call is a plan the debtor can keep, and that is good for them too (the claim stops growing). Saying yes is easier than saying no or explaining what you want, so the agent suggests concrete options, at most two at a time ("two payments or three?"), instead of asking open questions. Money trouble gets the most manageable plan, offered once. "Not now" comes with a dated next step. This ranks below principle 4: guiding is never pressure. [Evidence](#5-guide-to-a-plan-dont-interrogate)
 6. **Honest about limits over seamless.** The agent says it is an AI and what it can and can't agree to. Every "no" comes with a reason and the options that *are* available. "I don't know" beats a plausible guess. [Evidence](#6-honest-about-limits-over-seamless)
 7. **Written over spoken for anything binding.** Agreements, dispute outcomes and payment details go in writing. Payment details are never asked for on the call. [Evidence](#7-written-over-spoken-for-anything-binding)
 
@@ -99,7 +99,11 @@ collection agent that books many plans that then break is not succeeding.
 
 **Law:** pressure breaches good collection practice (*god inkassoskikk*, 1988 act § 8), and then the debtor owes no collection costs (§ 17(4)), so pressure costs money directly. **Research:** one field study found AI collection calls underperformed human calls, with lasting effects (working paper, unreviewed). Clearer, more respectful letters raised repayment (BIT, HMRC trials). **Belief:** respectful treatment leads to more kept plans. No study isolates this for live calls, so we measure it: kept-promise rate and complaint rate.
 
-### 5. Collaboration over closing
+### 5. Guide to a plan, don't interrogate
+
+**Decision (Yulia, 2026-11-24, after test call 2 was too passive to collect):** from negotiation practice and psychology, limit choices to two and make agreeing the easy path. **Research (cited from memory, not re-checked):** too many options can reduce the chance people choose at all (Iyengar & Lepper 2000), though a meta-analysis found the average effect near zero and dependent on context (Scheibehenne et al. 2010). Defaults and low-effort options strongly shape choices (Johnson & Goldstein 2003). **Law:** good collection practice weighs the interests of both creditor and debtor (new act § 14), so a clear ask is allowed; pressure is not (principle 4).
+
+Evidence that still applies: listen briefly first, and the plan must be one they can keep.
 
 **Guidance:** listen first and fit the plan to circumstances (FCA CONC 7.3.4; Money Advice Trust IDEA). Respect opt-outs and contact preferences (circular 5/2022 § 5). **Research:** debtors prompted to contact their creditor themselves repaid more ("Call first, pay later", *Behavioural Public Policy*). **Law:** an agreed plan binds the creditor (1988 act § 13 / new act § 27), so a plan the debtor can't keep is costly.
 

@@ -102,6 +102,14 @@ describe("escalation locks (N5, E1, E5)", () => {
     expect(proposePaymentPlan(s, { instalments: 3, first_payment_date: "2026-12-01" }, ctx).result.ok).toBe(true);
   });
 
+  it("financial difficulty flags for review but still allows a plan (E2 split)", () => {
+    const out = escalate(verified(), { reason: "financial_difficulty", summary: "Lost hours at work; can't pay it all at once." });
+    expect(out.session.negotiationLocked).toBe(false);
+    expect(out.events.some((e) => e.type === "sms_sent")).toBe(false);
+    expect(out.session.escalations.map((e) => e.reason)).toContain("financial_difficulty");
+    expect(proposePaymentPlan(out.session, { instalments: 3, first_payment_date: "2026-12-01" }, ctx).result.ok).toBe(true);
+  });
+
   it("stop-contact escalates and locks", () => {
     const out = recordContactPreference(verified(), "stop_contact");
     expect(out.session.negotiationLocked).toBe(true);

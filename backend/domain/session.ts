@@ -19,6 +19,7 @@ export type SessionState =
 export const ESCALATION_REASONS = [
   "crisis",
   "hardship",
+  "financial_difficulty",
   "dispute",
   "requested_human",
   "contact_preference",
@@ -282,7 +283,27 @@ const ESCALATION_SCRIPT: Partial<Record<EscalationReason, { say: string; sms: (s
   },
 };
 
+/**
+ * Money trouble without vulnerability signs (can't pay it all at once, job loss, tight budget).
+ * Not locking: the agent may still agree a plan, but a person reviews its affordability.
+ * No SMS and no state change, so the call can go on to a plan.
+ */
+function flagFinancialDifficulty(session: Session, escalation: Escalation): ToolOutcome {
+  return {
+    session: { ...session, escalations: [...session.escalations, escalation] },
+    events: [{ type: "escalated", escalation, locked: false }],
+    result: {
+      ok: true,
+      message:
+        "Flagged for a person to review affordability; the call continues. Acknowledge it warmly and say you're here to figure this out with them. " +
+        "Then suggest three monthly payments of one thousand kroner as the easiest option, mention that interest and fees stop while they keep to an agreed plan, " +
+        "and ask once whether one thousand a month would be manageable. If yes, propose that plan. If they can't commit, call escalate with reason hardship.",
+    },
+  };
+}
+
 export function escalate(session: Session, escalation: Escalation): ToolOutcome {
+  if (escalation.reason === "financial_difficulty") return flagFinancialDifficulty(session, escalation);
   const locked = LOCKING_REASONS.has(escalation.reason) || session.negotiationLocked;
   const script = ESCALATION_SCRIPT[escalation.reason];
   const body = escalation.reason === "recording_declined" && script

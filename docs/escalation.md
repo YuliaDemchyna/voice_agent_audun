@@ -11,7 +11,8 @@ model-written. Everything else is facts the backend recorded.
 | Reason code | Trigger | Priority | Reviewer acts within |
 |---|---|---|---|
 | `crisis` | Self-harm or suicide mentioned, or acute panic | **P0** | Immediately *(target)* |
-| `hardship` | Vulnerability or distress (illness, job loss, bereavement, "can't cope"), or possible lack of capacity (confusion, can't follow the options) | **P1** | 1 business day *(target)* |
+| `hardship` | Vulnerability or distress (illness, bereavement, "can't cope"), possible lack of capacity (confusion, can't follow the options), or money trouble where they can't commit to even the most manageable plan | **P1** | 1 business day *(target)* |
+| `financial_difficulty` | Money trouble without vulnerability signs (can't pay it all at once, job or hours lost). **Does not lock:** the call continues and the agent may agree the most manageable plan; a person checks the plan is affordable | P3 | 1 week |
 | `dispute` | Debtor says the claim is wrong, paid, or not theirs | P2 | Written, reasoned answer (new act § 25) |
 | `requested_human` | Debtor asks for a person | P2 | 1 week |
 | `contact_preference` | Debtor asks to stop contact or to be contacted only in writing | P2 (compliance) | Applied at once by code; human review within 1 week |

@@ -25,6 +25,7 @@ Not legal advice.
 | C6 | Tell the person about free debt advice (NAV *gjeldsrådgivning*) and how to reach the collector about payment difficulties. | prompt | new act § 16(3); Finanstilsynet consumer guidance | 4, 5 |
 | C7 | Record a contact preference (written only, callback time) and end the call politely. | code | Finanstilsynet circular 5/2022 § 5 | 5 |
 | C8 | Every "no" comes with the reason and the options that *are* available (or an offer of human review). | code: the policy engine returns a reason and alternatives with every rejection | product principle 6; new act § 15 (correct, understandable) | 6 |
+| C9 | **Guide to a plan.** Suggest concrete options, at most two at a time, as an easy yes ("in one go by the eighth, or split it?" then "two payments or three?"). No open questions like "what can I do for you?". The agent may say once, accurately, that interest and fees stop while an agreed plan is kept, and that late-payment interest keeps running without one, never as a threat. | prompt (judge D4, D6) | Yulia's design decision 2026-11-24; interest facts: A12, forsinkelsesrenteloven § 2 | 5 |
 
 ## Must never do
 
@@ -45,7 +46,7 @@ Not legal advice.
 | ID | Trigger | Enforced by | Source | Principle |
 |---|---|---|---|---|
 | E1 | **Dispute**: the debtor says the claim is paid, wrong, or not theirs. Collection pauses and the debtor gets a written answer. | code: `escalate("dispute")` | **[brief]**; new act §§ 24–25 | 3 |
-| E2 | **Hardship, vulnerability or possible lack of capacity**: illness, job loss, bereavement, distress, or confusion (can't follow the options). No agreement is taken from someone who can't decide. | prompt detects it; code then locks negotiation and confirmation | new act § 14(4); FCA FG21/1 and CONC 7.10 (UK practice, used as a benchmark) | 3, 4 |
+| E2 | **Hardship, split by severity (decided 2026-11-24).** *Money trouble* (can't pay it all, job or hours lost, tight budget) with no vulnerability signs: flag for review (`financial_difficulty`, P3, not locking), acknowledge, offer 3 × NOK 1,000 once with an affordability check, and agree it if they say yes; if they can't commit, escalate as hardship. *Vulnerability or possible lack of capacity* (illness, bereavement, distress, confusion): escalate as `hardship` at once; no agreement is taken. | prompt detects it; code: `financial_difficulty` leaves negotiation open, `hardship` locks negotiation and confirmation | new act § 14(4); FCA FG21/1 and CONC 7.10 (UK practice, used as a benchmark) | 3, 4, 5 |
 | E3 | **Out-of-policy request** the debtor wants reviewed (discount, longer plan, later start). | code: a policy rejection followed by a review request | **[brief]**; GDPR Art. 22(3) (right to human review) | 3, 6 |
 | E4 | The debtor **asks for a person**. | code: `escalate("requested_human")` | GDPR Art. 22(3) (best practice) | 3 |
 | E5 | **Stop contact** or written-only contact. Added to the opt-out register. | code | circular 5/2022 § 5 | 1, 5 |

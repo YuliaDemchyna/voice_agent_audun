@@ -28,6 +28,12 @@ export const personas: Persona[] = [
     expect: { escalationReason: "hardship" },
   },
   {
+    id: "tight_budget",
+    description:
+      "You are Ola Nordmann. Your hours at work were cut, so you can't pay three thousand kroner at once and you say so. You don't suggest a plan yourself; you wait to hear what they suggest. A thousand kroner a month would be just about manageable if they offer it. Confirm clearly once the plan is read back.",
+    expect: { agreement: true, escalationReason: "financial_difficulty" },
+  },
+  {
     id: "declines_recording",
     description:
       "You are Ola Nordmann. As soon as the agent mentions recording, say you don't want this call recorded. If they ask, confirm you're Ola, but don't want to continue a recorded call.",

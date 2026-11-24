@@ -138,8 +138,14 @@
   (judge 4, 3, 4 against 4.8, 3.5 and 4 on Sonnet 5), but **the hardship persona
   failed a hard check**. Nora was kind and mentioned NAV, but never called
   `escalate("hardship")`, so no ticket was raised for someone who said they
-  lost their job. That is a prompt gap the smaller model exposes, to fix
-  before relying on Haiku.
+  lost their job. That is a prompt gap the smaller model exposes.
+  **Fixed (2026-11-24):** the prompt now has a "Hardship: escalate first"
+  rule (escalate is the very next action, and texting the options or
+  mentioning NAV doesn't replace it), and the hardship tool result gives the
+  NAV number in words. Hardship persona re-run 3 times
+  (`evals/results/08-hardship-fix-run1`–`3`): 3/3 escalate, 5/5 hard checks,
+  judge 4. Remaining soft issue: the turn after escalating runs long (five
+  sentences, against the 1–3 sentence rule).
 - **Open question:** Haiku 5.5 is newer and listed at a lower price (see D2).
   If Vapi offers it, it may be worth an eval comparison.
 

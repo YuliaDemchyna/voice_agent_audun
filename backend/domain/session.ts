@@ -277,7 +277,7 @@ const ESCALATION_SCRIPT: Partial<Record<EscalationReason, { say: string; sms: (s
     sms: () => `${COLLECTOR_NAME}: thank you for talking with us. A member of our team will be in touch. If you need someone to talk to now, Mental Helse's helpline is 116 123.`,
   },
   hardship: {
-    say: "Tell them a person will contact them within a week and nothing needs to be decided today. Mention NAV's free debt advice. Ask if there's a good time or way to reach them.",
+    say: "Tell them a person from the team will contact them within a week and nothing needs to be decided today. Mention NAV's free debt advice and give the number in words: fifty-five, fifty-five, thirty-three, thirty-nine (it is also in the text you just sent). Ask if there's a good time or way to reach them.",
     sms: (s) => `${COLLECTOR_NAME}: thank you for talking with us about ref ${s.claim.reference}. Nothing needs to be decided now; a member of our team will contact you within 1 week. Free debt advice: NAV, 55 55 33 39.`,
   },
 };

@@ -4,8 +4,10 @@ A voice agent that contacts a debtor, verifies identity with a one-time code,
 answers questions about the claim, negotiates within policy, and follows up in
 writing after the call.
 
-> **Status:** Phase 0 (setup). Stack decisions are pending; see
-> [docs/architecture.md](docs/architecture.md#decision-log).
+> **Status:** Phase 0 done (setup and stack decisions). Stack: Vapi for voice,
+> Claude for the LLMs, TypeScript + Hono for the backend, `node:sqlite` for
+> storage, Vitest for evals. Rationale is in the
+> [decision log](docs/architecture.md#decision-log).
 
 ## The idea in one paragraph
 
@@ -47,7 +49,17 @@ how "hard rules are code" shows up in the folder structure.
 
 ## Running locally
 
-_TBD once the stack is chosen._
+Requires Node 22.13+.
+
+```bash
+npm install
+cp .env.example .env   # fill in ANTHROPIC_API_KEY and the Vapi keys
+npm run dev            # backend on http://localhost:8000
+npm test               # unit tests (no network)
+npm run evals          # simulated debtor conversations (calls real LLMs, costs money)
+```
+
+_The end-to-end demo steps (web UI, voice call) get added in Phase 3._
 
 ## Docs
 

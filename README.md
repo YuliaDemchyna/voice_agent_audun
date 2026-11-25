@@ -148,3 +148,4 @@ rules are code" shows up in the folders.
 | [evals/EVALUATION.md](evals/EVALUATION.md) | Evaluation criteria |
 | [evals/personas/CATALOGUE.md](evals/personas/CATALOGUE.md) | Persona catalogue and decisions |
 | [evals/REPORT.md](evals/REPORT.md) | Prompt-tuning report |
+| [evals/results/24-final-full/SUMMARY.md](evals/results/24-final-full/SUMMARY.md) | Final run on the final prompt: all 25 personas, 3 runs each, with per-persona results and transcripts |

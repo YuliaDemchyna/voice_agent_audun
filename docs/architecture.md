@@ -53,7 +53,8 @@
 
 - **Options considered:** Vapi in default mode; Vapi in custom-LLM mode;
   Pipecat; LiveKit Agents; ElevenLabs Agents; OpenAI Realtime. The comparison
-  table is in the working session linked from the [README](../README.md).
+  table is in the original working session, linked from the
+  [README](../README.md).
 - **Decision:** Vapi in default mode. Vapi runs STT, the LLM turn loop and TTS.
   Our tools are server tools that Vapi calls on our Hono backend over a
   webhook. The assistant config (prompt, tool list, model, voice) is defined

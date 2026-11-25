@@ -19,6 +19,52 @@ go to a human. Every call ends with a written follow-up.
 - Voice is a thin transport. The same prompt and tools run in **text mode**,
   so the agent can be tested without talking to it.
 
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Browser["Browser (web/)"]
+        UI["Demo UI<br/>phone mock, transcript,<br/>event log, tickets"]
+    end
+
+    subgraph Vapi["Vapi (hosted)"]
+        Voice["Speech-to-text, Claude Haiku 4.5,<br/>text-to-speech (Clara)"]
+    end
+
+    subgraph Backend["Backend (Hono, Node)"]
+        API["api/<br/>HTTP routes"]
+        Transport["transport/vapi.ts<br/>webhook adapter"]
+        Runtime["services/runtime.ts<br/>load, run, save, log"]
+        Tools["conversation/tools.ts<br/>tool schemas + dispatch"]
+        Domain["domain/<br/>claim, code check, policy,<br/>session state. No I/O, no LLM"]
+        Store[("node:sqlite<br/>sessions + event log")]
+        Follow["services/<br/>mock SMS, escalation tickets"]
+    end
+
+    subgraph Evals["Evals (evals/, text mode)"]
+        Sim["simulate.ts<br/>agent: Haiku 4.5<br/>debtor: Sonnet 5.5"]
+        Judge["judge.ts<br/>Opus 5.5"]
+    end
+
+    UI -- "start session, poll state" --> API
+    UI <-->|"voice call (WebRTC)"| Voice
+    Voice -- "tool calls via tunnel" --> Transport
+    API --> Runtime
+    Transport --> Runtime
+    Runtime --> Tools --> Domain
+    Runtime --> Store
+    Store --> Follow
+    Sim -- "same prompt + tools" --> Runtime
+    Sim --> Judge
+```
+
+The model never decides anything on its own. A tool call from Vapi (or from
+the simulator) goes through `runtime.ts` into the pure `domain/` layer, which
+approves or rejects it and returns a line the agent can say. Every result is
+written to the event log, and the UI, follow-ups, tickets and eval metrics are
+all read from that log. Vapi runs the voice call; the evals run the same
+prompt and tools without voice, so they test the logic the call uses.
+
 ## Stack
 
 | Part | Choice |

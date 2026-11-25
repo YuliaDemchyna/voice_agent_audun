@@ -1,9 +1,10 @@
 # Architecture
 
-> Full write-up comes in Phase 4. Until then this file holds the **decision
-> log**: every stack or architecture decision, with date, options considered,
-> the choice and the reason. The newest entry goes last. Git history keeps the
-> versions.
+> This file holds the principles and the **decision log**: every stack or
+> architecture decision, with date, options considered, the choice and the
+> reason. The newest entry goes last. Git history keeps the versions. The
+> diagrams are in the [README](../README.md#architecture), and scaling is in
+> [scaling.md](scaling.md).
 
 ## Principles (from the product thesis)
 

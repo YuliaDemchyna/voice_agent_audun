@@ -6,6 +6,9 @@ the person to a plan: pay in full, or 2–3 equal monthly instalments with the
 first payment within 14 days. Disputes, hardship and anything outside policy
 go to a human. Every call ends with a written follow-up.
 
+Built with Claude Code. The full working session is here:
+[conversation log](https://claude.ai/code/cshk_01NG4dsxM6AZ7LTSCUcudyzoDnSpZAPX6rZLo5tznZ31Mh).
+
 ## The idea
 
 **Hard rules live in code, and soft rules are evaluated.**
@@ -229,6 +232,7 @@ rules are code" shows up in the folders.
 | [escalation.md](docs/escalation.md) | When and how calls go to a human |
 | [assumptions.md](docs/assumptions.md) | What was assumed and why |
 | [architecture.md](docs/architecture.md) | Principles and the decision log |
+| [scaling.md](docs/scaling.md) | Scaling to a million concurrent calls: load math, bottlenecks, leaving Vapi, cost |
 | [research/](docs/research) | Norwegian law, collector norms, Vapi |
 | [evals/EVALUATION.md](evals/EVALUATION.md) | Evaluation criteria |
 | [evals/personas/CATALOGUE.md](evals/personas/CATALOGUE.md) | Persona catalogue and decisions |

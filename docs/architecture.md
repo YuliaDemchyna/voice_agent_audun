@@ -28,10 +28,10 @@
 |---|---|---|---|
 | D0 | 2026-11-24 | Repo layout: `domain` / `conversation` / `transport` split inside `backend/` (see README) | Accepted |
 | D1 | 2026-11-24 | Voice platform: **Vapi**, default mode (Vapi runs the LLM, our tools via server webhook) | Accepted |
-| D2 | 2026-11-24 | LLMs: agent **Claude Sonnet 5.5**, debtor simulator **Sonnet 5.5**, judge **Opus 5.5**; Haiku 5.5 as an eval comparison | Accepted |
+| D2 | 2026-11-24 | LLMs: agent **Claude Sonnet 5.5**, debtor simulator **Sonnet 5.5**, judge **Opus 5.5**; Haiku 5.5 as an eval comparison | Agent model superseded by D2a; simulator and judge accepted |
 | D3 | 2026-11-24 | Backend: **TypeScript + Hono**, one language across backend, web and evals | Accepted |
 | D4 | 2026-11-24 | Storage: **`node:sqlite`**, append-only `events` table | Accepted |
-| D5 | 2026-11-24 | Evals: **thin custom harness on Vitest** | Accepted |
+| D5 | 2026-11-24 | Evals: **thin custom harness** (`npm run sim`), Vitest for unit tests | Accepted (revised) |
 | D2a | 2026-11-24 | Agent model changed to **Claude Haiku 4.5** in voice and text mode, for latency first and price second | Accepted (supersedes the agent part of D2) |
 | D6 | 2026-11-24 | Voice: **Vapi "Clara"** (female) instead of ElevenLabs "sarah" | Accepted |
 
@@ -52,8 +52,8 @@
 ### D1: Voice platform, Vapi (default mode)
 
 - **Options considered:** Vapi in default mode; Vapi in custom-LLM mode;
-  Pipecat; LiveKit Agents; ElevenLabs Agents; OpenAI Realtime. The Phase 0
-  comparison table is in the session export.
+  Pipecat; LiveKit Agents; ElevenLabs Agents; OpenAI Realtime. The comparison
+  table is in the working session linked from the [README](../README.md).
 - **Decision:** Vapi in default mode. Vapi runs STT, the LLM turn loop and TTS.
   Our tools are server tools that Vapi calls on our Hono backend over a
   webhook. The assistant config (prompt, tool list, model, voice) is defined
@@ -114,12 +114,12 @@
   picker does not offer Sonnet 5.5. The voice agent uses the newest Claude
   model Vapi offers, and text mode keeps Sonnet 5.5. The text-mode model
   should be switched to match whatever voice runs, so evals test the same
-  model. Deferred to Phase 3. Per [research/vapi.md](research/vapi.md),
-  Vapi lists Claude Haiku 5.5 and Sonnet 5 but not Sonnet 5.5, so the
-  Phase 3 options are: (a) Haiku 5.5 in both modes, so there is no mismatch
-  and evals already compare it; (b) Sonnet 5 in both; (c) custom-LLM mode
-  with Sonnet 5.5. That model mismatch between voice and text is
-  one more reason to consider custom-LLM mode (see D1).
+  model. Per [research/vapi.md](research/vapi.md), Vapi lists Claude
+  Haiku 5.5 and Sonnet 5 but not Sonnet 5.5, so the options were: (a) Haiku
+  5.5 in both modes; (b) Sonnet 5 in both; (c) custom-LLM mode with Sonnet
+  5.5.
+- **Resolved by D2a:** both modes now run Claude Haiku 4.5, so evals test
+  the model voice uses.
 
 ### D2a: Agent model changed to Claude Haiku 4.5 (2026-11-24)
 
@@ -195,3 +195,10 @@
   fit poorly into promptfoo's single-prompt model.
 - **Tradeoff:** no hosted dashboard or experiment tracking. Results are
   committed JSON and Markdown.
+- **Revised (2026-11-24):** with 3 runs per persona, a pass/fail test per
+  persona was the wrong shape. The evals became a standalone script,
+  `npm run sim` (`evals/harness/simulate.ts`). It runs personas in parallel,
+  scores each run against labelled outcomes, hard checks and the judge, and
+  writes `SUMMARY.md` and `results.json` instead of failing a test. The
+  metrics in `evals/harness/metrics.ts` are pure functions with Vitest unit
+  tests (`npm test`). Criteria: [EVALUATION.md](../evals/EVALUATION.md).

@@ -10,7 +10,6 @@
     "dev": "tsx watch backend/api/server.ts",
     "start": "tsx backend/api/server.ts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p web",
-    "evals": "vitest run --config evals/vitest.config.ts",
     "vapi:sync": "tsx agent/sync-vapi.ts",
     "sim": "tsx evals/harness/simulate.ts"
   },

@@ -27,6 +27,10 @@ flowchart TB
         UI["Demo UI<br/>phone mock, transcript,<br/>event log, tickets"]
     end
 
+    subgraph AgentCfg["agent/"]
+        Agent["prompt.md, assistant.ts<br/>prompt, model, voice"]
+    end
+
     subgraph Vapi["Vapi (hosted)"]
         Voice["Speech-to-text, Claude Haiku 4.5,<br/>text-to-speech (Clara)"]
     end
@@ -36,9 +40,9 @@ flowchart TB
         Transport["transport/vapi.ts<br/>webhook adapter"]
         Runtime["services/runtime.ts<br/>load, run, save, log"]
         Tools["conversation/tools.ts<br/>tool schemas + dispatch"]
-        Domain["domain/<br/>claim, code check, policy,<br/>session state. No I/O, no LLM"]
-        Store[("node:sqlite<br/>sessions + event log")]
-        Follow["services/<br/>mock SMS, escalation tickets"]
+        Domain["domain/<br/>claim, code check, policy,<br/>session state, events incl. sms_sent.<br/>No I/O, no LLM"]
+        Store[("services/store.ts<br/>node:sqlite<br/>sessions + event log")]
+        Tickets["services/tickets.ts<br/>builds tickets from events<br/>when the API reads a session"]
     end
 
     subgraph Evals["Evals (evals/, text mode)"]
@@ -46,16 +50,51 @@ flowchart TB
         Judge["judge.ts<br/>Opus 5.5"]
     end
 
-    UI -- "start session, poll state" --> API
+    Agent -- "npm run vapi:sync (before calls):<br/>prompt, tools, model, voice" --> Voice
+    Agent -- "same prompt + tools" --> Sim
+    UI -- "start session, post transcript lines,<br/>poll state" --> API
     UI <-->|"voice call (WebRTC)"| Voice
     Voice -- "tool calls via tunnel" --> Transport
     API --> Runtime
     Transport --> Runtime
     Runtime --> Tools --> Domain
     Runtime --> Store
-    Store --> Follow
-    Sim -- "same prompt + tools" --> Runtime
+    API -- "read session + events" --> Store
+    API --> Tickets
+    Sim -- "runTool" --> Runtime
     Sim --> Judge
+```
+
+One call, start to finish:
+
+```mermaid
+sequenceDiagram
+    participant UI as Browser (debtor)
+    participant V as Vapi (Haiku 4.5)
+    participant B as Backend (runtime + domain)
+
+    Note over UI,B: Before
+    UI->>B: POST /api/sessions
+    B-->>UI: sessionId
+    UI->>V: vapi.start(assistantId, sessionId)
+
+    Note over UI,B: During
+    V->>B: send_verification_code
+    B-->>V: sent (sms_sent event, code shows on the phone)
+    UI->>V: debtor reads out the code
+    V->>B: verify_code
+    B-->>V: verified, or attempts left
+    V->>B: get_claim_details
+    B-->>V: claim (only once verified)
+    V->>B: propose_payment_plan
+    B-->>V: approved plan to read back, or a reason
+    UI->>V: explicit "yes"
+    V->>B: confirm_agreement (with the quote)
+    B-->>V: recorded, confirmation SMS logged
+
+    Note over UI,B: After
+    UI->>B: GET /api/sessions/:id
+    B-->>UI: events, SMS, tickets (if escalated)
 ```
 
 The model never decides anything on its own. A tool call from Vapi (or from
